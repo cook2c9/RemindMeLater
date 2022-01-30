@@ -24,27 +24,44 @@ https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play
 
 ## Functional Requirements 
 **Given** a user wants to set a reminder to purchase paper towels the next time they enter Kroger  
-**When** a user sets a new reminder  
+
+**When** a user sets a new reminder 
+
 **Then** the user will set the reminder to Kroger’s location, and add the note “Purchase Paper Towels”  
 
-**Given** Kroger is located at 123 S Main St.  
+
+**Given** Kroger is located at 123 S Main St. 
+
 **When** The user is within 10 yards of 123 S Main St.  
+
 **Then** A reminder will display  
 
-**Given** you want to tell your mother a story about work, the next time you see her  
+
+**Given** you want to tell your mother a story about work, the next time you see her 
+
 **When** you arrive at your mother’s house the next day  
+
 **Then** a notification reminds you to tell your mother the story  
   
+  
 **Given** a reminder displays on the user’s device  
+
 **When** the user interacts with the notification  
+
 **Then** the user can either cancel or repeat the reminder  
 
+
 **Given** a family of four are in a reminder group  
+
 **When** a family member adds a reminder to pick up milk at Kroger  
+
 **Then** all family members receive a notification the next time they enter Kroger  
 
+
 **Given** You left your charger in your dad’s car 
+
 **When** you set a reminder for the next time your dad comes to your house 
+
 **Then** when your dad arrives at your house, a reminder will notify him to return your charger 
 
  

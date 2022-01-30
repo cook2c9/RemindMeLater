@@ -84,10 +84,9 @@ https://github.com/cook2c9/RemindMeLater/projects/1
 ![KanbanBoard](https://user-images.githubusercontent.com/26448642/151712282-f4742639-7c43-4e1e-9f09-6d349d1efeee.png)
 
 ## Scrum Roles 
-Product Owner – Connor Cook 
-SCRUM Master -  
-Developers -  
-
+Product Owner – Connor Cook
+SCRUM Master – Connor Cook
+Developers - Christopher Elbe, Steve Falconieri, Christian Grothaus
 
 ## Link to meeting 
 Meeting via Teams – Created a separate group with all members included. We also created a group chat via text, so we can quickly communicate 

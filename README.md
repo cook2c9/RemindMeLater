@@ -85,8 +85,11 @@ https://github.com/cook2c9/RemindMeLater/projects/1
 
 ## Scrum Roles 
 Product Owner – Connor Cook
+<br/>
 SCRUM Master – Connor Cook
+<br/>
 Developers - Christopher Elbe, Steve Falconieri, Christian Grothaus
+<br/>
 
 ## Link to meeting 
 Meeting via Teams – Created a separate group with all members included. We also created a group chat via text, so we can quickly communicate 

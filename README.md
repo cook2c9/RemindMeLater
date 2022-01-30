@@ -28,7 +28,7 @@ https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play
 **When** a user sets a new reminder 
 
 **Then** the user will set the reminder to Kroger’s location, and add the note “Purchase Paper Towels”
-</br>
+<br />
   
 **Given** Kroger is located at 123 S Main St. 
 

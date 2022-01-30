@@ -23,19 +23,21 @@ https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play
 - Users can also manage their current reminders, edit and remove them.  
 
 ## Functional Requirements 
+<pre>
 **Given** a user wants to set a reminder to purchase paper towels the next time they enter Kroger  
 
 **When** a user sets a new reminder 
 
 **Then** the user will set the reminder to Kroger’s location, and add the note “Purchase Paper Towels”
-<br />
+</pre>
   
+<pre>
 **Given** Kroger is located at 123 S Main St. 
 
 **When** The user is within 10 yards of 123 S Main St.  
 
 **Then** A reminder will display  
-
+</pre>
   
 **Given** you want to tell your mother a story about work, the next time you see her 
 

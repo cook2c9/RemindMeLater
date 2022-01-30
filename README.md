@@ -12,7 +12,7 @@ We also want to allow multiple users to join groups and send reminders to each o
 
 https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play 
 
-A screenshot of a phone
+![A screenshot of a phone](image.png)
 
 Description automatically generated with medium confidence A picture containing text, screenshot, electronics
 

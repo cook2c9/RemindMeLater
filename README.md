@@ -37,35 +37,35 @@ https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play
 **When** The user is within 10 yards of 123 S Main St.  
 
 **Then** A reminder will display  
-
+<br/><br/>
  
 **Given** you want to tell your mother a story about work, the next time you see her 
 
 **When** you arrive at your mother’s house the next day  
 
 **Then** a notification reminds you to tell your mother the story  
-
+<br/><br/>
     
 **Given** a reminder displays on the user’s device  
 
 **When** the user interacts with the notification  
 
 **Then** the user can either cancel or repeat the reminder  
-
+<br/><br/>
   
 **Given** a family of four are in a reminder group  
 
 **When** a family member adds a reminder to pick up milk at Kroger  
 
 **Then** all family members receive a notification the next time they enter Kroger  
-
+<br/><br/>
   
 **Given** You left your charger in your dad’s car 
 
 **When** you set a reminder for the next time your dad comes to your house 
 
 **Then** when your dad arrives at your house, a reminder will notify him to return your charger 
-
+<br/><br/>
    
 ## Class Diagram 
 ![ClassDiagram](https://user-images.githubusercontent.com/26448642/151712249-1223edec-e8d8-434a-840d-95da18b3d050.png)

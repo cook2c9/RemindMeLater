@@ -74,12 +74,12 @@ The class diagram consists of 5 packages: a main package, UI package, service pa
  
 
 ## Product Backlog 
-https://github.com/cook2c9/RemindMeLater/projects 
+[Backlog for Design Stage](https://github.com/cook2c9/RemindMeLater/projects)
 
 ![Backlog](https://user-images.githubusercontent.com/26448642/151712274-9687903e-c142-4bf5-a43c-c54963e35413.png)
 
 ## Scrum/Kanban Board 
-https://github.com/cook2c9/RemindMeLater/projects/1 
+[Kanban Board](https://github.com/cook2c9/RemindMeLater/projects/1)
 
 ![KanbanBoard](https://user-images.githubusercontent.com/26448642/151712282-f4742639-7c43-4e1e-9f09-6d349d1efeee.png)
 

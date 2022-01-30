@@ -29,7 +29,7 @@ https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play
 **When** a user sets a new reminder 
 
 **Then** the user will set the reminder to Kroger’s location, and add the note “Purchase Paper Towels”
-<br/><br/>
+&nbsp; 
 
   
 **Given** Kroger is located at 123 S Main St. 
@@ -37,42 +37,40 @@ https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play
 **When** The user is within 10 yards of 123 S Main St.  
 
 **Then** A reminder will display  
-<br/><br/>
+&nbsp; 
  
 **Given** you want to tell your mother a story about work, the next time you see her 
 
 **When** you arrive at your mother’s house the next day  
 
 **Then** a notification reminds you to tell your mother the story  
-<br/><br/>
+&nbsp; 
     
 **Given** a reminder displays on the user’s device  
 
 **When** the user interacts with the notification  
 
 **Then** the user can either cancel or repeat the reminder  
-<br/><br/>
+&nbsp;
   
 **Given** a family of four are in a reminder group  
 
 **When** a family member adds a reminder to pick up milk at Kroger  
 
 **Then** all family members receive a notification the next time they enter Kroger  
-<br/><br/>
+&nbsp;
   
 **Given** You left your charger in your dad’s car 
 
 **When** you set a reminder for the next time your dad comes to your house 
 
 **Then** when your dad arrives at your house, a reminder will notify him to return your charger 
-<br/><br/>
+&nbsp;
    
 ## Class Diagram 
 ![ClassDiagram](https://user-images.githubusercontent.com/26448642/151712249-1223edec-e8d8-434a-840d-95da18b3d050.png)
 
-The class diagram consists of 5 packages: a main package, UI package, service package, DTO package and DAO package.  Within the main package we have a class  
-
-Paragraph locked by Grothaus, Christian (grothact)
+The class diagram consists of 5 packages: a main package, UI package, service package, DTO package and DAO package.  Within the main package we have the class “AppModule” for Koin for implementing dependency injection.  Also, within the main package we will have a class called “RetrofitClientInstance”.  This class will be used for being able to parse JSON files.  The next package, UI, will consist of “MainActivity”, “ViewModel”, and “ApplicationViewModel” classes.  The “MainActivity” class will be used with the “ViewModel” and “ApplicationViewModel” to display live data.  The service package will contain “IReminderService” which will be an interface used to for both “ReminderService” and “ReminderServiceStub”.  “ReminderService” will pass any DAOs to the “ViewModel”.  The stub will be added to allow for UI work to be done even without the “ReminderService” being completed.  In the DTO package we will have a “Reminder” class.  This class will be used for creating objects that hold a unique reminder ID, the thing you want to be reminded of, the location of the reminder, alert radius, and who to remind.  The DAO package contains a “IReminderDAO” class that will be used by “ReminderService” to access stored data.  There will also be a “ReminderDatabase” class which will extend a Room database for storing the information for the reminders locally. 
  
 
 ## Product Backlog 

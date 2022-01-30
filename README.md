@@ -8,7 +8,7 @@ How often do you run out of a product, or realize you needed a specific item fro
 We also want to allow multiple users to join groups and send reminders to each other. For example, if I am riding in the car with my dad while charging my phone, I may forget to grab my charger before leaving. If this is the case, I can set a reminder for my dad’s phone to notify him the next time he gets to my house. His phone’s onboard navigation will recognize the pre-determined location that I set and notify him of my note the next time he is within a certain radius of my house.  
 
 ## Storyboard 
-https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play 
+[RemindMeLater Storyboard](https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play)
 
 
 ![StoryboardMain](https://user-images.githubusercontent.com/26448642/151712166-10061b3d-7f2c-4638-bc32-113db4d55f9b.png)

@@ -12,25 +12,17 @@ We also want to allow multiple users to join groups and send reminders to each o
 
 https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play 
 
-![A screenshot of a phone](image.png)
 
-Description automatically generated with medium confidence A picture containing text, screenshot, electronics
+![StoryboardMain](https://user-images.githubusercontent.com/26448642/151712166-10061b3d-7f2c-4638-bc32-113db4d55f9b.png)
+![Storyboard2](https://user-images.githubusercontent.com/26448642/151712175-28c628ff-390a-4ac2-8444-20f44ffa364d.png)
+![Storyboard3](https://user-images.githubusercontent.com/26448642/151712184-24ce892a-1602-4927-ba63-3f8cbb9747a6.png)
 
-Description automatically generated A screenshot of a phone
+- On the first screen, a map is displayed which will pinpoint your current reminders 
+- On the second screen, users can enter reminders for themselves – only they will receive these reminders 
+- On the third screen, users can enter other types of reminders, and for other users in their groups 
 
-Description automatically generated with low confidence 
-
-On the first screen, a map is displayed which will pinpoint your current reminders 
-
-On the second screen, users can enter reminders for themselves – only they will receive these reminders 
-
-On the third screen, users can enter other types of reminders, and for other users in their groups 
-
-    A screenshot of a phone
-
-Description automatically generated with medium confidence 
-
-Users can also manage their current reminders, edit and remove them.  
+![StoryboardMain](https://user-images.githubusercontent.com/26448642/151712191-523c4e74-a8c9-4718-a101-2a3aeb270870.png)
+- Users can also manage their current reminders, edit and remove them.  
 
 ## Functional Requirements 
 
@@ -83,10 +75,7 @@ Then when your dad arrives at your house, a reminder will notify him to return y
  
 
 ## Class Diagram 
-
-Diagram
-
-Description automatically generated 
+![ClassDiagram](https://user-images.githubusercontent.com/26448642/151712249-1223edec-e8d8-434a-840d-95da18b3d050.png)
 
 The class diagram consists of 5 packages: a main package, UI package, service package, DTO package and DAO package.  Within the main package we have a class  
 
@@ -97,17 +86,13 @@ Paragraph locked by Grothaus, Christian (grothact)
 
 https://github.com/cook2c9/RemindMeLater/projects 
 
-Graphical user interface, text, application
-
-Description automatically generated 
+![Backlog](https://user-images.githubusercontent.com/26448642/151712274-9687903e-c142-4bf5-a43c-c54963e35413.png)
 
 ## Scrum/Kanban Board 
 
 https://github.com/cook2c9/RemindMeLater/projects/1 
 
-Graphical user interface, text, application
-
-Description automatically generated 
+![KanbanBoard](https://user-images.githubusercontent.com/26448642/151712282-f4742639-7c43-4e1e-9f09-6d349d1efeee.png)
 
 ## Scrum Roles 
 
@@ -115,19 +100,8 @@ Product Owner – Connor Cook
 SCRUM Master -  
 Developers -  
 
- 
 
- 
-
- 
-
- 
-
- 
-
- 
-
-Link to meeting 
+## Link to meeting 
 
 Meeting via Teams – Created a separate group with all members included. We also created a group chat via text, so we can quickly communicate 
 

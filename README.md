@@ -1,0 +1,138 @@
+# RemindMeLater – Design Document 
+
+### Connor Cook, Christopher Elbe, Steven Falconieri, Christian Grothaus 
+
+## Introduction 
+
+How often do you run out of a product, or realize you needed a specific item from a store? This happens to us quite often: we realize we need something and think, “I should get that the next time I am at the store” only to forget that we needed it when we get there. RemindMeLater aims to allow users to set reminders and be notified at the right time. If you realize you need paper towels the next time you are at Kroger, you can set a reminder for the location of your choosing. The next time you are within a certain radius of Kroger, you will be notified to purchase paper towels.  
+
+We also want to allow multiple users to join groups and send reminders to each other. For example, if I am riding in the car with my dad while charging my phone, I may forget to grab my charger before leaving. If this is the case, I can set a reminder for my dad’s phone to notify him the next time he gets to my house. His phone’s onboard navigation will recognize the pre-determined location that I set and notify him of my note the next time he is within a certain radius of my house.  
+
+## Storyboard 
+
+https://projects.invisionapp.com/prototype/ckyz5anql0004z501i6op35w0/play 
+
+A screenshot of a phone
+
+Description automatically generated with medium confidence A picture containing text, screenshot, electronics
+
+Description automatically generated A screenshot of a phone
+
+Description automatically generated with low confidence 
+
+On the first screen, a map is displayed which will pinpoint your current reminders 
+
+On the second screen, users can enter reminders for themselves – only they will receive these reminders 
+
+On the third screen, users can enter other types of reminders, and for other users in their groups 
+
+    A screenshot of a phone
+
+Description automatically generated with medium confidence 
+
+Users can also manage their current reminders, edit and remove them.  
+
+## Functional Requirements 
+
+Given a user wants to set a reminder to purchase paper towels the next time they enter Kroger  
+
+When a user sets a new reminder  
+
+Then the user will set the reminder to Kroger’s location, and add the note “Purchase Paper Towels”  
+
+  
+
+Given Kroger is located at 123 S Main St.  
+
+When The user is within 10 yards of 123 S Main St.  
+
+Then A reminder will display  
+
+  
+
+Given you want to tell your mother a story about work, the next time you see her  
+
+When you arrive at your mother’s house the next day  
+
+Then a notification reminds you to tell your mother the story   
+
+  
+
+Given a reminder displays on the user’s device  
+
+When the user interacts with the notification  
+
+Then the user can either cancel or repeat the reminder  
+
+  
+
+Given a family of four are in a reminder group  
+
+When a family member adds a reminder to pick up milk at Kroger  
+
+Then all family members receive a notification the next time they enter Kroger  
+
+ 
+
+Given You left your charger in your dad’s car 
+
+When you set a reminder for the next time your dad comes to your house 
+
+Then when your dad arrives at your house, a reminder will notify him to return your charger 
+
+ 
+
+## Class Diagram 
+
+Diagram
+
+Description automatically generated 
+
+The class diagram consists of 5 packages: a main package, UI package, service package, DTO package and DAO package.  Within the main package we have a class  
+
+Paragraph locked by Grothaus, Christian (grothact)
+ 
+
+## Product Backlog 
+
+https://github.com/cook2c9/RemindMeLater/projects 
+
+Graphical user interface, text, application
+
+Description automatically generated 
+
+## Scrum/Kanban Board 
+
+https://github.com/cook2c9/RemindMeLater/projects/1 
+
+Graphical user interface, text, application
+
+Description automatically generated 
+
+## Scrum Roles 
+
+Product Owner – Connor Cook 
+SCRUM Master -  
+Developers -  
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Link to meeting 
+
+Meeting via Teams – Created a separate group with all members included. We also created a group chat via text, so we can quickly communicate 
+
+Graphical user interface, application
+
+Description automatically generated 
+
+Github - https://github.com/cook2c9/RemindMeLater 

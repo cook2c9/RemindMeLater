@@ -15,7 +15,7 @@ class ExampleUnitTest {
         assertEquals(4, 2 + 2)
     }
     @Test
-    fun fivePluFive_EqualsTen(){
-        assertEquals(10, 5 + 5)
+    fun sevenPlusThree_EqualsTen(){
+        assertEquals(10, 7+3)
     }
 }

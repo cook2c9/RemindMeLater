@@ -7,9 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +34,22 @@ class MainActivity : ComponentActivity() {
 fun Greeting(name: String) {
     val context = LocalContext.current
     Column {
+        TopAppBar(
+            elevation = 4.dp,
+            title = {
+                Text("Remind Me Later")
+            },
+            backgroundColor = MaterialTheme.colors.primarySurface,
+            navigationIcon = {
+                IconButton(onClick = {/* Do Something*/ }) {
+                    Icon(Icons.Filled.Menu, null)
+                }
+            }, actions = {
+                IconButton(onClick = { /*showDialog.value = true*/ }) {
+                    Icon(Icons.Filled.Settings, null)
+                }
+            })
+
         Text(text = "Hello, Set a Reminder for...")
         Row (
             horizontalArrangement = Arrangement.SpaceEvenly,

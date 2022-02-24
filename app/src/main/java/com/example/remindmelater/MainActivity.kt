@@ -5,10 +5,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,22 +38,37 @@ fun Greeting(name: String) {
     Column {
         Text(text = "Hello, Set a Reminder for...")
         Row (
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxWidth()
                 ) {
             Button(onClick = { Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show() },
                     modifier = Modifier
                         .padding(4.dp)
-                        .width(175.dp)
+                        .width(190.dp)
                         .height(50.dp)
                 ){
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 4.dp)
+                )
                 Text(text = "Myself")
             }
             Button(onClick = { Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show() },
                     modifier = Modifier
                         .padding(4.dp)
-                        .width(174.dp)
+                        .width(190.dp)
                         .height(50.dp)
                 ){
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                )
                 Text(text = "Others")
             }
         }
@@ -62,6 +78,11 @@ fun Greeting(name: String) {
                     .padding(4.dp)
                     .height(35.dp)
             ){
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 4.dp)
+            )
             Text(text = "View Reminder List")
         }
 

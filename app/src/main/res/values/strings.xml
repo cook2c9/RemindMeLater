@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">RemindMeLater</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="greeting">Hello, Set a Reminder for&#8230;</string>
+    <string name="myself">Myself</string>
+    <string name="clicked">You clicked the button</string>
+    <string name="remind_me_later">Remind Me Later</string>
+    <string name="remind">Remind</string>
+    <string name="location">Location</string>
+    <string name="for_text">For</string>
+    <string name="reminder_list">Reminder List</string>
+    <string name="map_view_label">Map View</string>
+    <string name="others">Others</string>
+    <string name="marker_in_sydney">Marker in Sydney</string>
 </resources>

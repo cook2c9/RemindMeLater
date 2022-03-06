@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.remindmelater.databinding.ActivityMapsBinding
@@ -28,7 +29,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    lateinit var mMap: GoogleMap
+    private lateinit var mMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             RemindMeLaterTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    MainScreen("Android")
+                    MainScreen()
                     Map()
                 }
             }
@@ -48,19 +49,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(sydney).title(getString(R.string.marker_in_sydney)))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
 
 
     @Composable
-    fun MainScreen(name: String) {
+    fun MainScreen() {
         val context = LocalContext.current
+        val clicked = stringResource(R.string.clicked)
+        val remindMeLater = stringResource(R.string.remind_me_later)
+        val reminderList = stringResource(R.string.reminder_list)
+        val mapViewLabel = stringResource(R.string.map_view_label)
+        val others = stringResource(R.string.others)
         Column {
             TopAppBar(
                 elevation = 4.dp,
                 title = {
-                    Text("Remind Me Later")
+                    Text(remindMeLater)
                 },
                 backgroundColor = Color(105, 208, 225),
                 navigationIcon = {
@@ -74,7 +80,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 })
 
             Text(
-                text = "Hello, Set a Reminder for...",
+                text = stringResource(R.string.greeting),
                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
             )
             Row(
@@ -83,7 +89,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             ) {
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, clicked, Toast.LENGTH_LONG).show()
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -96,11 +102,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         contentDescription = null,
                         modifier = Modifier.padding(end = 4.dp)
                     )
-                    Text(text = "Myself")
+                    Text(text = stringResource(R.string.myself))
                 }
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, clicked, Toast.LENGTH_LONG).show()
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -117,7 +123,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         imageVector = Icons.Default.Person,
                         contentDescription = null,
                     )
-                    Text(text = "Others")
+                    Text(text = others)
                 }
             }
             Row(
@@ -126,7 +132,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             ) {
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, clicked, Toast.LENGTH_LONG).show()
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -139,11 +145,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         contentDescription = null,
                         modifier = Modifier.padding(end = 4.dp)
                     )
-                    Text(text = "Reminder List")
+                    Text(text = reminderList)
                 }
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, clicked, Toast.LENGTH_LONG).show()
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -156,7 +162,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         contentDescription = null,
                         modifier = Modifier.padding(end = 4.dp)
                     )
-                    Text(text = "Map View")
+                    Text(text = mapViewLabel)
                 }
             }
             Scaffold { innerPadding ->
@@ -169,8 +175,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         @Composable
         fun ReminderListItem() {
-            Column() {
-                Text(text = "Reminder:")
+            val remind = stringResource(R.string.remind)
+            val location = stringResource(R.string.location)
+            val forText = stringResource(R.string.for_text)
+            Column {
+                Text(text = "$remind:")
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically,
@@ -178,7 +187,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         .fillMaxWidth()
                         .padding(7.dp)
                 ) {
-                    Text(text = "Location:")
+                    Text(text = "$location:")
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
@@ -189,7 +198,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         contentDescription = null,
                         modifier = Modifier.padding(end = 4.dp)
                     )
-                    Text(text = "For:")
+                    Text(text = "$forText:")
                 }
             }
 
@@ -201,7 +210,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @Composable
     fun DefaultPreview() {
         RemindMeLaterTheme {
-            MainScreen("Android")
+            MainScreen()
         }
     }
 

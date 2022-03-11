@@ -46,10 +46,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        addMapMarker("Marker in Sydney", -34.0, 151.0)
+        moveMapCamera(-34.0,151.0)
     }
 
 
@@ -197,14 +195,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    @Preview(showBackground = true)
-    @Composable
-    fun DefaultPreview() {
-        RemindMeLaterTheme {
-            MainScreen("Android")
-        }
-    }
-
     @Composable
     fun Map() {
         Box()
@@ -217,5 +207,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 .findFragmentById(R.id.map) as SupportMapFragment
             mapFragment.getMapAsync(this@MainActivity)
         }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        RemindMeLaterTheme {
+            MainScreen("Android")
+        }
+    }
+
+    fun addMapMarker(label: String,lat: Double, long: Double) {
+        // Adds a map marker with a label at the given lat and long.
+        var loc = LatLng(lat,long)
+        mMap.addMarker(MarkerOptions().position(loc).title(label))
+    }
+
+    fun moveMapCamera(lat: Double, long: Double) {
+        // Moves camera location to given lat and long
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,long)))
     }
 }

@@ -6,6 +6,6 @@ import retrofit2.http.GET
 
 interface IReminderDAO {
 
-    @GET("Specific URL for JSON Data")
+    @GET("/perl/mobile/viewplantsjsonarray.pl")
     fun getAllReminders() : Call<ArrayList<Reminder>>
 }

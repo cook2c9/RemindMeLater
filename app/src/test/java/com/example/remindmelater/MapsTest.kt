@@ -27,7 +27,7 @@ class MapsTest {
     }
 
     private suspend fun whenAppLaunched() {
-        allReminders = reminderService.getReminders()
+        //allReminders = reminderService.getReminders()
     }
 
     private fun thenCreateMapMarkers() {

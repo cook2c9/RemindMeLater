@@ -18,6 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.remindmelater.databinding.ActivityMapsBinding
+import com.example.remindmelater.dto.Reminder
+import com.example.remindmelater.service.ReminderServiceStub
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -46,8 +48,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        addMapMarker("Marker in Sydney", -34.0, 151.0)
-        moveMapCamera(-34.0,151.0)
+        addSavedReminders()
+        moveMapCamera(39.103,-84.512)
     }
 
 
@@ -217,14 +219,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    fun addMapMarker(label: String,lat: Double, long: Double) {
+    private fun addMapMarker(label: String, lat: Double, long: Double) {
         // Adds a map marker with a label at the given lat and long.
         var loc = LatLng(lat,long)
         mMap.addMarker(MarkerOptions().position(loc).title(label))
     }
 
-    fun moveMapCamera(lat: Double, long: Double) {
+    private fun moveMapCamera(lat: Double, long: Double) {
         // Moves camera location to given lat and long
         mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,long)))
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
+    }
+
+    private fun addSavedReminders() {
+        var savedReminders: List<Reminder>? = ReminderServiceStub().getReminders()
+        savedReminders?.let {
+            it.forEach{ reminder ->
+                addMapMarker(reminder.title, reminder.latitude, reminder.longitude)
+            }
+        }
     }
 }

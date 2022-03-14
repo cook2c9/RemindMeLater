@@ -1,25 +1,30 @@
 package com.example.remindmelater
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.remindmelater.databinding.ActivityMapsBinding
 import com.example.remindmelater.dto.Reminder
-import com.example.remindmelater.service.ReminderServiceStub
+import com.example.remindmelater.service.ReminderService
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -27,31 +32,48 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     lateinit var mMap: GoogleMap
+    private var selectedReminder: Reminder? = null
+    private val viewModel: MainViewModel by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            viewModel.fetchReminders()
             RemindMeLaterTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
+                Surface(
+                    color = MaterialTheme.colors.background
+                ) {
                     MainScreen("Android")
-                    Map()
+                    ReminderListItem()
+                //Map()
                 }
+
             }
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        RemindMeLaterTheme {
+            MainScreen("Android")
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        addSavedReminders()
-        moveMapCamera(39.103,-84.512)
+        // Add a marker in Sydney and move the camera
+        val sydney = LatLng(-34.0, 151.0)
+        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
-
 
     @Composable
     fun MainScreen(name: String) {
@@ -160,36 +182,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
             Scaffold { innerPadding ->
-                LazyColumn(contentPadding = innerPadding) {
+                Column() {
 
-                }
-            }
-
-        }
-
-        @Composable
-        fun ReminderListItem() {
-            Column() {
-                Text(text = "Reminder:")
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(7.dp)
-                ) {
-                    Text(text = "Location:")
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
-                    Text(text = "For:")
                 }
             }
 
@@ -198,44 +192,31 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @Composable
-    fun Map() {
-        Box()
-        {
-            val binding = ActivityMapsBinding.inflate(layoutInflater)
-            addContentView(binding.root, ViewGroup.LayoutParams(-1, -1))
+    fun ReminderListItem() {
+        var reminderData = viewModel.fetchReminders()
 
-            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
-            mapFragment.getMapAsync(this@MainActivity)
-        }
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun DefaultPreview() {
-        RemindMeLaterTheme {
-            MainScreen("Android")
-        }
-    }
-
-    private fun addMapMarker(label: String, lat: Double, long: Double) {
-        // Adds a map marker with a label at the given lat and long.
-        var loc = LatLng(lat,long)
-        mMap.addMarker(MarkerOptions().position(loc).title(label))
-    }
-
-    private fun moveMapCamera(lat: Double, long: Double) {
-        // Moves camera location to given lat and long
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,long)))
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
-    }
-
-    private fun addSavedReminders() {
-        var savedReminders: List<Reminder>? = ReminderServiceStub().getReminders()
-        savedReminders?.let {
-            it.forEach{ reminder ->
-                addMapMarker(reminder.title, reminder.latitude, reminder.longitude)
+        Log.d(TAG, "Results Array: $reminderData")
+        Column() {
+            Text(text = "Reminder: ${reminderData}")
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(7.dp)
+            ) {
+                Text(text = "Location:")
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+                Text(text = "For:")
             }
         }
     }

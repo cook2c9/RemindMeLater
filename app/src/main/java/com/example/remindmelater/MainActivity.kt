@@ -3,28 +3,25 @@ package com.example.remindmelater
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.remindmelater.databinding.ActivityMapsBinding
 import com.example.remindmelater.dto.Reminder
-import com.example.remindmelater.service.ReminderService
+import com.example.remindmelater.service.ReminderServiceStub
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -32,18 +29,19 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.runBlocking
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    lateinit var mMap: GoogleMap
+    private lateinit var mMap: GoogleMap
+    private lateinit var mapView: View
     private var selectedReminder: Reminder? = null
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            viewModel.fetchReminders()
             RemindMeLaterTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -51,7 +49,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 ) {
                     MainScreen("Android")
                     ReminderListItem()
-                //Map()
+                    Map()
                 }
 
             }
@@ -69,10 +67,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        runBlocking { addSavedReminders() }
+        moveMapCamera(39.103,-84.512)
     }
 
     @Composable
@@ -149,6 +145,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        hideMap()
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -166,6 +163,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        showMap()
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -217,6 +215,48 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     modifier = Modifier.padding(end = 4.dp)
                 )
                 Text(text = "For:")
+            }
+        }
+    }
+
+    @Composable
+    private fun Map() {
+        val binding = ActivityMapsBinding.inflate(layoutInflater)
+        addContentView(binding.root, ViewGroup.LayoutParams(-1, -1))
+
+//     Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this@MainActivity)
+    }
+
+    private fun hideMap() {
+        mapView = findViewById(R.id.map)
+        mapView.visibility = View.INVISIBLE
+    }
+
+    private fun showMap() {
+        mapView = findViewById(R.id.map)
+        mapView.visibility = View.VISIBLE
+    }
+
+    private fun addMapMarker(label: String, lat: Double, long: Double) {
+        // Adds a map marker with a label at the given lat and long.
+        val loc = LatLng(lat,long)
+        mMap.addMarker(MarkerOptions().position(loc).title(label))
+    }
+
+    private fun moveMapCamera(lat: Double, long: Double) {
+        // Moves camera location to given lat and long
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat,long)))
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
+    }
+
+    private suspend fun addSavedReminders() {
+        val savedReminders: List<Reminder>? = ReminderServiceStub().fetchReminders()
+        savedReminders?.let {
+            it.forEach{ reminder ->
+                addMapMarker(reminder.title, reminder.latitude, reminder.longitude)
             }
         }
     }

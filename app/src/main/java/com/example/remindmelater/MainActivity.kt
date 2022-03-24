@@ -1,8 +1,11 @@
 package com.example.remindmelater
 
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -22,6 +25,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
 import com.example.remindmelater.databinding.ActivityMapsBinding
 import com.example.remindmelater.dto.Reminder
 import com.example.remindmelater.service.ReminderService
@@ -32,6 +38,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -40,29 +47,56 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var selectedReminder: Reminder? = null
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
 
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var reminderArrayList: ArrayList<Reminder>
+    private lateinit var reminderAdapter: ReminderAdapter
+    private lateinit var db : FirebaseFirestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            viewModel.fetchReminders()
-            RemindMeLaterTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    color = MaterialTheme.colors.background
-                ) {
-                    MainScreen("Android")
-                    ReminderListItem()
-                //Map()
-                }
+        setContentView(R.layout.activity_main)
 
-            }
-        }
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.setHasFixedSize(true)
+
+        reminderArrayList = arrayListOf()
+
+        reminderAdapter = ReminderAdapter(reminderArrayList)
+
+        recyclerView.adapter = reminderAdapter
+
+        EventChangeListener()
+
+    }
+
+    private fun EventChangeListener() {
+        db = FirebaseFirestore.getInstance()
+        db.collection("reminders")
+            .addSnapshotListener(object: EventListener<QuerySnapshot>{
+                override fun onEvent(
+                    value: QuerySnapshot?,
+                    error: FirebaseFirestoreException?
+                ) {
+                    if(error != null){
+                        Log.e("Firestore Error: ", error.message.toString())
+                        return
+                    }
+                    for(dc: DocumentChange in value?.documentChanges!!){
+                        if(dc.type == DocumentChange.Type.ADDED){
+                            reminderArrayList.add(dc.document.toObject(Reminder::class.java))
+                        }
+                    }
+                    reminderAdapter.notifyDataSetChanged()
+                }
+            })
     }
 
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview() {
         RemindMeLaterTheme {
-            MainScreen("Android")
+            MainScreen()
         }
     }
 
@@ -76,7 +110,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @Composable
-    fun MainScreen(name: String) {
+    fun MainScreen() {
         val context = LocalContext.current
         Column {
             TopAppBar(
@@ -191,33 +225,4 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    @Composable
-    fun ReminderListItem() {
-        var reminderData = viewModel.fetchReminders()
-
-        Log.d(TAG, "Results Array: $reminderData")
-        Column() {
-            Text(text = "Reminder: ${reminderData}")
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(7.dp)
-            ) {
-                Text(text = "Location:")
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp)
-                )
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp)
-                )
-                Text(text = "For:")
-            }
-        }
-    }
 }

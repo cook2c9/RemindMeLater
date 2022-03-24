@@ -5,13 +5,12 @@
       <map>
         <entry key="..\:/Users/Connor/AndroidStudioProjects/RemindMeLater/RemindMeLater-3922/app/src/main/res/layout/activity_maps.xml" value="0.2786458333333333" />
         <entry key="..\:/Users/Connor/AndroidStudioProjects/RemindMeLater/RemindMeLater-3922/app/src/main/res/layout/reminder_fragment.xml" value="0.2786458333333333" />
+        <entry key="..\:/Users/Connor/AndroidStudioProjects/RemindMeLater/RemindMeLater_3-24/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Connor/AndroidStudioProjects/RemindMeLater/RemindMeLater_3-24/app/src/main/res/layout/row_reminders.xml" value="0.3183876811594203" />
         <entry key="..\:/Users/cgrot/AndroidStudioProjects/RemindMeLater/app/src/main/res/layout/activity_maps.xml" value="0.8335146898803046" />
         <entry key="..\:/Users/falco/AndroidStudioProjects/RemindMeLater/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1645" />
       </map>
     </option>
-  </component>
-  <component name="ProjectPlainTextFileTypeManager">
-    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/reminder_fragment.xml" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />

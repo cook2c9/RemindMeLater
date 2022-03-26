@@ -1,41 +1,33 @@
 package com.example.remindmelater
 
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.os.Bundle
-import android.util.AttributeSet
 import android.util.Log
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
-import com.example.remindmelater.databinding.ActivityMapsBinding
 import com.example.remindmelater.dto.Reminder
-import com.example.remindmelater.service.ReminderService
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.*
@@ -66,30 +58,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         recyclerView.adapter = reminderAdapter
 
-        EventChangeListener()
-
-    }
-
-    private fun EventChangeListener() {
-        db = FirebaseFirestore.getInstance()
-        db.collection("reminders")
-            .addSnapshotListener(object: EventListener<QuerySnapshot>{
-                override fun onEvent(
-                    value: QuerySnapshot?,
-                    error: FirebaseFirestoreException?
+        setContent {
+            RemindMeLaterTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    color = MaterialTheme.colors.background
                 ) {
-                    if(error != null){
-                        Log.e("Firestore Error: ", error.message.toString())
-                        return
-                    }
-                    for(dc: DocumentChange in value?.documentChanges!!){
-                        if(dc.type == DocumentChange.Type.ADDED){
-                            reminderArrayList.add(dc.document.toObject(Reminder::class.java))
-                        }
-                    }
-                    reminderAdapter.notifyDataSetChanged()
+                    MainScreen()
+                    ReminderRow()
                 }
-            })
+            }
+        }
     }
 
     @Preview(showBackground = true)
@@ -97,6 +76,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     fun DefaultPreview() {
         RemindMeLaterTheme {
             MainScreen()
+            ReminderRow()
         }
     }
 
@@ -140,6 +120,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Log.d("MESSAGE: ", "Myself Button Clicked")
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -157,6 +138,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Log.d("MESSAGE: ", "Others Button Clicked")
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -182,7 +164,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             ) {
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Log.d("MESSAGE: ", "Reminder List Button Clicked")
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -200,6 +182,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Log.d("MESSAGE: ", "Map View Button Clicked")
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -225,4 +208,52 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    @Composable
+    fun ReminderRow(){
+       Log.d("Array List", " ")
+
+        val reminders_ = remember { mutableStateListOf(Reminder())}
+
+        viewModel.fetchReminders(reminders_)
+
+        Row (
+            modifier = Modifier.padding(vertical = 200.dp)
+        ){
+            LazyColumn() {
+                items(reminders_) { item: Reminder ->
+                    ReminderListItem(item)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun ReminderListItem(reminder: Reminder) {
+        Log.d("Reminder List ", "Loaded Successfully")
+        Column(
+
+        ) {
+            Text(text = "Reminder: ${reminder.body}")
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(0.dp)
+            ) {
+                Text(text = "Location: ")
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 4.dp, top = 0.dp),
+                )
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 4.dp, top = 0.dp)
+                )
+                Text(text = "For: ${reminder.userEmail}")
+            }
+        }
+    }
 }

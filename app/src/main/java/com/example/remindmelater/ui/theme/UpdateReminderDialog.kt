@@ -38,7 +38,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
             Surface(
                 modifier = Modifier
                     .width(300.dp)
-                    .height(530.dp)
+                    .height(580.dp)
                     .padding(5.dp),
                 shape = RoundedCornerShape(5.dp),
                 color = Color.LightGray
@@ -106,23 +106,41 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
                     )
 
                     Spacer(modifier = Modifier.padding(15.dp))
-
-                    Button(
-                        onClick = {
-                            openDialog.value = false
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(0.5f)
-                            .height(60.dp)
-                            .padding(10.dp),
-                        shape = RoundedCornerShape(5.dp),
-                        colors = ButtonDefaults.buttonColors(Purple500)
-                    ) {
-                        Text(
-                            text = "Close",
-                            color = Color.Cyan,
-                            fontSize = 12.sp
-                        )
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = {
+                                openDialog.value = false
+                            },
+                            modifier = Modifier
+                                //.fillMaxWidth(0.5f)
+                                .height(60.dp)
+                                .padding(10.dp),
+                            shape = RoundedCornerShape(5.dp),
+                            colors = ButtonDefaults.buttonColors(Purple500)
+                        ) {
+                            Text(
+                                text = "Close",
+                                color = Color.White,
+                                fontSize = 12.sp
+                            )
+                            Button(
+                                onClick = {
+                                    openDialog.value = false
+                                },
+                                modifier = Modifier
+                                    //.fillMaxWidth(0.5f)
+                                    .height(60.dp)
+                                    .padding(10.dp),
+                                shape = RoundedCornerShape(5.dp),
+                                colors = ButtonDefaults.buttonColors(Purple500)
+                            ) {
+                                Text(
+                                    text = "Save",
+                                    color = Color.White,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
                     }
                 }
             }

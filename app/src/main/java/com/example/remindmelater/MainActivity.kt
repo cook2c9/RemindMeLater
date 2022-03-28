@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        openDialog.value = true
                     },
                     modifier = Modifier
                         .padding(4.dp)

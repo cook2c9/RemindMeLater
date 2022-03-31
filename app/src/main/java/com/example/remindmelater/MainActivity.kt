@@ -21,6 +21,8 @@ import androidx.compose.runtime.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +39,7 @@ import com.example.remindmelater.databinding.ActivityMapsBinding
 
 import com.example.remindmelater.service.ReminderServiceStub
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
+import com.example.remindmelater.ui.theme.UpdateReminderDialog
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationServices
@@ -56,15 +59,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mapView: View
-    private lateinit var recyclerView: View
-    private var selectedReminder: Reminder? = null
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var userLatitude = 0.0
     private var userLongitude = 0.0
-
-    private lateinit var reminderArrayList: ArrayList<Reminder>
-    private lateinit var reminderAdapter: ReminderAdapter
-    private lateinit var db : FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,8 +75,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Surface(
                     color = MaterialTheme.colors.background
                 ) {
+
                     MainScreen()
-                    ReminderRow()
                     isLocationPermissionGranted()
                     Map()
                 }
@@ -107,6 +104,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @Composable
     fun MainScreen() {
         val context = LocalContext.current
+        val openDialog = remember {mutableStateOf(false)}
+        var isVisible by remember { mutableStateOf(true) }
         Column {
             TopAppBar(
                 elevation = 4.dp,
@@ -128,14 +127,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 text = "Hello, Set a Reminder for...",
                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
             )
+            UpdateReminderDialog(openDialog)
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
-                        Log.d("MESSAGE: ", "Myself Button Clicked")
+
+                         openDialog.value = true
+
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -152,8 +153,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
-                        Log.d("MESSAGE: ", "Others Button Clicked")
+
+                        openDialog.value = true
+
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -182,7 +184,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         Log.d("MESSAGE: ", "Reminder List Button Clicked")
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         hideMap()
-                        showReminder()
+                        isVisible = true
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -202,8 +204,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         Log.d("MESSAGE: ", "Map View Button Clicked")
 //                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
-
-                        hideMap()
+                        isVisible = false
                         showMap()
                         moveMapToUser()
                     },
@@ -221,16 +222,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Text(text = "Map View")
                 }
             }
+            if(isVisible) {
+                ReminderRow()
+            }
             Scaffold { innerPadding ->
                 Column() {
 
                 }
             }
-
         }
-
     }
-
 
     @Composable
     fun ReminderRow(){
@@ -280,15 +281,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
-    }
-
-
-    fun hideReminder() {
-
-    }
-
-    fun showReminder() {
-
     }
 
     @Composable

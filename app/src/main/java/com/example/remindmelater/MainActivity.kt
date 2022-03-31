@@ -21,6 +21,8 @@ import androidx.compose.runtime.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +39,7 @@ import com.example.remindmelater.databinding.ActivityMapsBinding
 
 import com.example.remindmelater.service.ReminderServiceStub
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
+import com.example.remindmelater.ui.theme.UpdateReminderDialog
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationServices
@@ -78,8 +81,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Surface(
                     color = MaterialTheme.colors.background
                 ) {
+
                     MainScreen()
                     ReminderRow()
+
+                   
                     isLocationPermissionGranted()
                     Map()
                 }
@@ -107,6 +113,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @Composable
     fun MainScreen() {
         val context = LocalContext.current
+        val openDialog = remember {mutableStateOf(false)}
         Column {
             TopAppBar(
                 elevation = 4.dp,
@@ -128,14 +135,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 text = "Hello, Set a Reminder for...",
                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
             )
+            UpdateReminderDialog(openDialog)
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
-                        Log.d("MESSAGE: ", "Myself Button Clicked")
+
+                         openDialog.value = true
+
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -152,8 +161,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
-                        Log.d("MESSAGE: ", "Others Button Clicked")
+
+                        openDialog.value = true
+
                     },
                     modifier = Modifier
                         .padding(4.dp)

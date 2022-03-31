@@ -11,6 +11,13 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -21,6 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
+import com.example.remindmelater.dto.Reminder
 import androidx.core.app.ActivityCompat
 import com.example.remindmelater.databinding.ActivityMapsBinding
 import com.example.remindmelater.dto.Reminder
@@ -32,9 +43,9 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.runBlocking
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -49,21 +60,39 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var userLatitude = 0.0
     private var userLongitude = 0.0
 
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var reminderArrayList: ArrayList<Reminder>
+    private lateinit var reminderAdapter: ReminderAdapter
+    private lateinit var db : FirebaseFirestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.setHasFixedSize(true)
+
+        reminderArrayList = arrayListOf()
+
+        reminderAdapter = ReminderAdapter(reminderArrayList)
+
+        recyclerView.adapter = reminderAdapter
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        setContent {
+        
+      setContent {
             RemindMeLaterTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colors.background
                 ) {
+                    MainScreen()
+                    ReminderRow()
                     MainScreen("Android")
                     ReminderListItem()
                     isLocationPermissionGranted()
                     Map()
                 }
-
             }
         }
 
@@ -80,12 +109,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @Composable
     fun DefaultPreview() {
         RemindMeLaterTheme {
-            MainScreen("Android")
+            MainScreen()
+            ReminderRow()
         }
     }
 
     @Composable
-    fun MainScreen(name: String) {
+    fun MainScreen() {
         val context = LocalContext.current
         Column {
             TopAppBar(
@@ -115,6 +145,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Log.d("MESSAGE: ", "Myself Button Clicked")
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -132,6 +163,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Log.d("MESSAGE: ", "Others Button Clicked")
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -157,6 +189,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             ) {
                 Button(
                     onClick = {
+                        Log.d("MESSAGE: ", "Reminder List Button Clicked")
+=======
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         hideMap()
                     },
@@ -175,6 +209,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
                 Button(
                     onClick = {
+                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+                        Log.d("MESSAGE: ", "Map View Button Clicked")
 //                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         showMap()
                         moveMapToUser()
@@ -204,9 +240,31 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @Composable
-    fun ReminderListItem() {
-        var reminderData = viewModel.fetchReminders()
+    fun ReminderRow(){
+       Log.d("Array List", " ")
 
+        val reminders_ = remember { mutableStateListOf(Reminder())}
+
+        viewModel.fetchReminders(reminders_)
+
+        Row (
+            modifier = Modifier.padding(vertical = 200.dp)
+        ){
+            LazyColumn() {
+                items(reminders_) { item: Reminder ->
+                    ReminderListItem(item)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun ReminderListItem(reminder: Reminder) {
+        Log.d("Reminder List ", "Loaded Successfully")
+        Column(
+
+        ) {
+            Text(text = "Reminder: ${reminder.body}")
         Log.d(TAG, "Results Array: $reminderData")
         Column() {
             Text(text = "Reminder: $reminderData")
@@ -215,20 +273,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(7.dp)
+                    .padding(0.dp)
             ) {
-                Text(text = "Location:")
+                Text(text = "Location: ")
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp)
+                    modifier = Modifier.padding(end = 4.dp, top = 0.dp),
                 )
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp)
+                    modifier = Modifier.padding(end = 4.dp, top = 0.dp)
                 )
-                Text(text = "For:")
+                Text(text = "For: ${reminder.userEmail}")
             }
         }
     }

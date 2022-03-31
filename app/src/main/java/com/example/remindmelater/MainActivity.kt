@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
 import com.example.remindmelater.dto.Reminder
 import androidx.core.app.ActivityCompat
+import com.example.remindmelater.databinding.ActivityMainBinding
 import com.example.remindmelater.databinding.ActivityMapsBinding
 
 import com.example.remindmelater.service.ReminderServiceStub
@@ -55,19 +56,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mapView: View
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerView: View
     private var selectedReminder: Reminder? = null
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var userLatitude = 0.0
     private var userLongitude = 0.0
 
-    //private lateinit var recyclerView: RecyclerView
     private lateinit var reminderArrayList: ArrayList<Reminder>
     private lateinit var reminderAdapter: ReminderAdapter
     private lateinit var db : FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -181,7 +182,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         Log.d("MESSAGE: ", "Reminder List Button Clicked")
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         hideMap()
-
+                        showReminder()
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -202,6 +203,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         Log.d("MESSAGE: ", "Map View Button Clicked")
 //                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
 
+                        hideMap()
                         showMap()
                         moveMapToUser()
                     },
@@ -229,157 +231,167 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+
     @Composable
     fun ReminderRow(){
-       Log.d("Array List", " ")
 
-        val reminders_ = remember { mutableStateListOf(Reminder())}
+        val reminders_ = remember { mutableStateListOf(Reminder()) }
 
         viewModel.fetchReminders(reminders_)
 
-        Row (
+        Row(
             modifier = Modifier.padding(vertical = 200.dp)
-        ){
+        ) {
             LazyColumn() {
                 items(reminders_) { item: Reminder ->
-                    ReminderListItem(item)
+                    ReminderListItem(item, true)
                 }
             }
         }
     }
 
     @Composable
-    fun ReminderListItem(reminder: Reminder) {
-        Log.d("Reminder List ", "Loaded Successfully")
-        Column(
+    fun ReminderListItem(reminder: Reminder, isVisible: Boolean) {
+        if(isVisible) {
+            Log.d("Reminder List ", reminder.userEmail)
+            Column(
 
-        ) {
-            Text(text = "Reminder: ${reminder.body}")
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(0.dp)
             ) {
-                Text(text = "Location: ")
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp, top = 0.dp),
-                )
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp, top = 0.dp)
-                )
-                Text(text = "For: ${reminder.userEmail}")
+                Text(text = "Reminder: ${reminder.body}")
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp)
+                ) {
+                    Text(text = "Location: ")
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 4.dp, top = 0.dp),
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 4.dp, top = 0.dp)
+                    )
+                    Text(text = "For: ${reminder.userEmail}")
+                }
             }
         }
     }
 
-        @Composable
-        fun Map() {
-            val binding = ActivityMapsBinding.inflate(layoutInflater)
-            addContentView(binding.root, ViewGroup.LayoutParams(-1, -1))
+
+    fun hideReminder() {
+
+    }
+
+    fun showReminder() {
+
+    }
+
+    @Composable
+    fun Map() {
+        val binding = ActivityMapsBinding.inflate(layoutInflater)
+        addContentView(binding.root, ViewGroup.LayoutParams(-1, -1))
 
 //     Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
-            mapFragment.getMapAsync(this@MainActivity)
-        }
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this@MainActivity)
+    }
 
-        fun hideMap() {
-            mapView = findViewById(R.id.map_layout)
-            mapView.visibility = View.INVISIBLE
-        }
+    fun hideMap() {
+        mapView = findViewById(R.id.map_layout)
+        mapView.visibility = View.INVISIBLE
+    }
 
-        fun showMap() {
-            mapView = findViewById(R.id.map_layout)
-            enableUserLocation(mMap)
-            mapView.visibility = View.VISIBLE
-        }
+    fun showMap() {
+        mapView = findViewById(R.id.map_layout)
+        enableUserLocation(mMap)
+        mapView.visibility = View.VISIBLE
+    }
 
+    // Adds a map marker with a label at the given lat and long.
+    fun addMapMarker(label: String, lat: Double, long: Double) {
+        val loc = LatLng(lat, long)
+        mMap.addMarker(MarkerOptions().position(loc).title(label))
+    }
 
-        // Adds a map marker with a label at the given lat and long.
-        fun addMapMarker(label: String, lat: Double, long: Double) {
-            val loc = LatLng(lat, long)
-            mMap.addMarker(MarkerOptions().position(loc).title(label))
-        }
+    // Moves camera location to given lat and long
+    fun moveMapCamera(lat: Double, long: Double) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, long)))
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
+    }
 
-        // Moves camera location to given lat and long
-        fun moveMapCamera(lat: Double, long: Double) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, long)))
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
-        }
-
-        suspend fun addSavedReminders() {
-            val savedReminders: List<Reminder>? = ReminderServiceStub().fetchReminders()
-            savedReminders?.let {
-                it.forEach { reminder ->
-                    addMapMarker(reminder.title, reminder.latitude.toDouble(), reminder.longitude.toDouble())
-                }
+    suspend fun addSavedReminders() {
+        val savedReminders: List<Reminder>? = ReminderServiceStub().fetchReminders()
+        savedReminders?.let {
+            it.forEach { reminder ->
+                addMapMarker(reminder.title, reminder.latitude.toDouble(), reminder.longitude.toDouble())
             }
         }
+    }
 
-        // Checks whether all location permissions are granted and returns true or false
-        fun isLocationPermissionGranted(): Boolean {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return false
-            }
-            return true
-        }
-
-        // Sends a permission request to the user for the needed location permissions
-        fun requestLocationPermission() {
-            ActivityCompat.requestPermissions(
+    // Checks whether all location permissions are granted and returns true or false
+    fun isLocationPermissionGranted(): Boolean {
+        if (ActivityCompat.checkSelfPermission(
                 this,
-                arrayOf(
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                1
-            )
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return false
         }
+        return true
+    }
 
-        //Gets users current location if available
-        @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
-        fun getCurrentLocation(): Map<String, Double> {
-            var token = CancellationTokenSource().token
+    // Sends a permission request to the user for the needed location permissions
+    fun requestLocationPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            1
+        )
+    }
 
-            return if (isLocationPermissionGranted()) {
-                fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, token)
-                    .addOnSuccessListener { loc ->
-                        userLatitude = loc.latitude
-                        userLongitude = loc.longitude
-                    }
-                mapOf("latitude" to userLatitude, "longitude" to userLongitude)
-            } else {
-                requestLocationPermission()
-                mapOf("latitude" to 10.0, "longitude" to 10.0)
-            }
+    //Gets users current location if available
+    @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
+    fun getCurrentLocation(): Map<String, Double> {
+        var token = CancellationTokenSource().token
+
+        return if (isLocationPermissionGranted()) {
+            fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, token)
+                .addOnSuccessListener { loc ->
+                    userLatitude = loc.latitude
+                    userLongitude = loc.longitude
+                }
+            mapOf("latitude" to userLatitude, "longitude" to userLongitude)
+        } else {
+            requestLocationPermission()
+            mapOf("latitude" to 10.0, "longitude" to 10.0)
         }
+    }
 
-        @SuppressLint("MissingPermission")
-        fun enableUserLocation(map: GoogleMap) {
-            if (isLocationPermissionGranted()) {
-                map.isMyLocationEnabled = true
-            } else {
-                requestLocationPermission()
-            }
+    @SuppressLint("MissingPermission")
+    fun enableUserLocation(map: GoogleMap) {
+        if (isLocationPermissionGranted()) {
+            map.isMyLocationEnabled = true
+        } else {
+            requestLocationPermission()
         }
+    }
 
-        fun moveMapToUser() {
-            var loc = getCurrentLocation()
-            var lat = loc["latitude"]
-            var long = loc["longitude"]
-            moveMapCamera(lat!!, long!!)
-        }
+    fun moveMapToUser() {
+        var loc = getCurrentLocation()
+        var lat = loc["latitude"]
+        var long = loc["longitude"]
+        moveMapCamera(lat!!, long!!)
+    }
 }

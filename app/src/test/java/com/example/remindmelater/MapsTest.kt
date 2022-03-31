@@ -2,8 +2,8 @@ package com.example.remindmelater
 
 import com.example.remindmelater.dto.Reminder
 import com.example.remindmelater.service.ReminderService
-import org.junit.Assert.*
 import org.junit.Test
+import org.junit.Assert.*
 
 class MapsTest {
 
@@ -19,7 +19,7 @@ class MapsTest {
     suspend fun `given reminder data when the app is launched then a map marker for each reminder should be created`(){
         givenReminderServiceIsInitialized()
         whenAppLaunched()
-        thenAddMapMarkers()
+        thenCreateMapMarkers()
     }
 
     private fun givenReminderServiceIsInitialized() {
@@ -30,7 +30,7 @@ class MapsTest {
         //allReminders = reminderService.getReminders()
     }
 
-    private fun thenAddMapMarkers() {
+    private fun thenCreateMapMarkers() {
         assertNotNull(allReminders)
         assertTrue(allReminders!!.isNotEmpty())
         TODO("Finish creating test")

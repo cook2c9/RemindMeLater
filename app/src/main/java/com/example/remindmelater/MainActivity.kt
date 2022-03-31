@@ -59,15 +59,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var mapView: View
-    private lateinit var recyclerView: View
-    private var selectedReminder: Reminder? = null
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var userLatitude = 0.0
     private var userLongitude = 0.0
-
-    private lateinit var reminderArrayList: ArrayList<Reminder>
-    private lateinit var reminderAdapter: ReminderAdapter
-    private lateinit var db : FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,9 +77,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 ) {
 
                     MainScreen()
-                    ReminderRow()
-
-                   
                     isLocationPermissionGranted()
                     Map()
                 }
@@ -114,6 +105,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     fun MainScreen() {
         val context = LocalContext.current
         val openDialog = remember {mutableStateOf(false)}
+        var isVisible by remember { mutableStateOf(true) }
         Column {
             TopAppBar(
                 elevation = 4.dp,
@@ -192,7 +184,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         Log.d("MESSAGE: ", "Reminder List Button Clicked")
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         hideMap()
-                        showReminder()
+                        isVisible = true
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -212,8 +204,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         Log.d("MESSAGE: ", "Map View Button Clicked")
 //                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
-
-                        hideMap()
+                        isVisible = false
                         showMap()
                         moveMapToUser()
                     },
@@ -231,16 +222,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Text(text = "Map View")
                 }
             }
+            if(isVisible) {
+                ReminderRow()
+            }
             Scaffold { innerPadding ->
                 Column() {
 
                 }
             }
-
         }
-
     }
-
 
     @Composable
     fun ReminderRow(){
@@ -290,15 +281,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
-    }
-
-
-    fun hideReminder() {
-
-    }
-
-    fun showReminder() {
-
     }
 
     @Composable

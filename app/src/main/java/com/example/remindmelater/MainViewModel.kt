@@ -10,7 +10,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
+import com.example.remindmelater.ReminderAdapter
 import com.example.remindmelater.dto.Reminder
 import com.example.remindmelater.service.IReminderService
 import com.example.remindmelater.service.ReminderService
@@ -66,7 +66,7 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
             reminders.updateList(listOf())
         }
     }
-    //Extention function of the one above, used to clear or add the List of reminders
+    //Extension function of the one above, used to clear or add the List of reminders
     private fun <T> SnapshotStateList<T>.updateList(reminderList: List<T>) {
         clear()
         addAll(reminderList)

@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
+import com.example.remindmelater.ReminderAdapter
 import com.example.remindmelater.dto.Reminder
 import androidx.core.app.ActivityCompat
 import com.example.remindmelater.databinding.ActivityMainBinding
@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Surface(
                     color = MaterialTheme.colors.background
                 ) {
-
                     MainScreen()
                     isLocationPermissionGranted()
                     Map()
@@ -134,9 +133,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             ) {
                 Button(
                     onClick = {
-
                          openDialog.value = true
-
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -153,9 +150,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
                 Button(
                     onClick = {
-
                         openDialog.value = true
-
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -225,7 +220,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             if(isVisible) {
                 ReminderRow()
             }
-            Scaffold { innerPadding ->
+            Scaffold {
                 Column() {
 
                 }
@@ -236,15 +231,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @Composable
     fun ReminderRow(){
 
-        val reminders_ = remember { mutableStateListOf(Reminder()) }
+        val reminderItems = remember { mutableStateListOf(Reminder()) }
 
-        viewModel.fetchReminders(reminders_)
+        viewModel.fetchReminders(reminderItems)
 
         Row(
             modifier = Modifier.padding(vertical = 200.dp)
         ) {
             LazyColumn() {
-                items(reminders_) { item: Reminder ->
+                items(reminderItems) { item: Reminder ->
                     ReminderListItem(item, true)
                 }
             }
@@ -294,40 +289,40 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this@MainActivity)
     }
 
-    fun hideMap() {
+    private fun hideMap() {
         mapView = findViewById(R.id.map_layout)
         mapView.visibility = View.INVISIBLE
     }
 
-    fun showMap() {
+    private fun showMap() {
         mapView = findViewById(R.id.map_layout)
         enableUserLocation(mMap)
         mapView.visibility = View.VISIBLE
     }
 
     // Adds a map marker with a label at the given lat and long.
-    fun addMapMarker(label: String, lat: Double, long: Double) {
+    private fun addMapMarker(label: String, lat: Double, long: Double) {
         val loc = LatLng(lat, long)
         mMap.addMarker(MarkerOptions().position(loc).title(label))
     }
 
     // Moves camera location to given lat and long
-    fun moveMapCamera(lat: Double, long: Double) {
+    private fun moveMapCamera(lat: Double, long: Double) {
         mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, long)))
         mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
     }
 
-    suspend fun addSavedReminders() {
+    private suspend fun addSavedReminders() {
         val savedReminders: List<Reminder>? = ReminderServiceStub().fetchReminders()
         savedReminders?.let {
             it.forEach { reminder ->
-                addMapMarker(reminder.title, reminder.latitude.toDouble(), reminder.longitude.toDouble())
+                addMapMarker(reminder.title, reminder.latitude, reminder.longitude)
             }
         }
     }
 
     // Checks whether all location permissions are granted and returns true or false
-    fun isLocationPermissionGranted(): Boolean {
+    private fun isLocationPermissionGranted(): Boolean {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION
@@ -342,7 +337,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // Sends a permission request to the user for the needed location permissions
-    fun requestLocationPermission() {
+    private fun requestLocationPermission() {
         ActivityCompat.requestPermissions(
             this,
             arrayOf(
@@ -380,7 +375,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    fun moveMapToUser() {
+    private fun moveMapToUser() {
         var loc = getCurrentLocation()
         var lat = loc["latitude"]
         var long = loc["longitude"]

@@ -18,34 +18,30 @@ import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 @Composable
 fun ReminderListItem() {
 
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(text = "Reminder:")
+        Text(text = "For:")
+        Text(text = "Location:")
+        Text(text = "Range:")
 
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Reminder:")
-            Text(text = "For:")
-            Text(text = "Location:")
-            Text(text = "Range:")
-
-            Column() {
-                Row(
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    IconButton(onClick = {/* Do Something*/ }) {
-                        Icon(Icons.Filled.Edit, null)
-                    }
-                    IconButton(onClick = {/* Do Something*/ }) {
-                        Icon(Icons.Filled.Delete, null)
-                    }
+        Column() {
+            Row(
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = {/* Do Something*/ }) {
+                    Icon(Icons.Filled.Edit, null)
+                }
+                IconButton(onClick = {/* Do Something*/ }) {
+                    Icon(Icons.Filled.Delete, null)
                 }
             }
-
         }
 
     }
 
-
-
+}
 
 @Preview(showBackground = true)
 @Composable

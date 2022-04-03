@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @Composable
     fun MainScreen() {
         val context = LocalContext.current
-        val openDialog = remember {mutableStateOf(false)}
+        val openDialog = remember { mutableStateOf(false) }
         var isVisible by remember { mutableStateOf(true) }
         Column {
             TopAppBar(
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
 
-                         openDialog.value = true
+                        openDialog.value = true
 
                     },
                     modifier = Modifier
@@ -222,7 +222,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Text(text = "Map View")
                 }
             }
-            if(isVisible) {
+            if (isVisible) {
                 ReminderRow()
             }
             Scaffold { innerPadding ->
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @Composable
-    fun ReminderRow(){
+    fun ReminderRow() {
 
         val reminders = remember { mutableStateListOf(Reminder()) }
 
@@ -253,7 +253,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @Composable
     fun ReminderListItem(reminder: Reminder, isVisible: Boolean) {
-        if(isVisible) {
+        if (isVisible) {
             Log.d("Reminder List ", reminder.userEmail)
             Column(
 
@@ -321,7 +321,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val savedReminders: List<Reminder>? = ReminderServiceStub().fetchReminders()
         savedReminders?.let {
             it.forEach { reminder ->
-                addMapMarker(reminder.title, reminder.latitude.toDouble(), reminder.longitude.toDouble())
+                addMapMarker(
+                    reminder.title,
+                    reminder.latitude.toDouble(),
+                    reminder.longitude.toDouble()
+                )
             }
         }
     }

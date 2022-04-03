@@ -21,34 +21,32 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainViewModel(var reminderService : IReminderService = ReminderService()) : ViewModel() {
+class MainViewModel(var reminderService: IReminderService = ReminderService()) : ViewModel() {
 
     internal val NEW_REMINDER = "New Reminder"
-    private lateinit var firestore : FirebaseFirestore
-    var reminders : MutableLiveData<List<Reminder>> = MutableLiveData<List<Reminder>>()
+    private var firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    var reminders: MutableLiveData<List<Reminder>> = MutableLiveData<List<Reminder>>()
     var selectedReminder by mutableStateOf(Reminder())
     private lateinit var reminderAdapter: ReminderAdapter
 
-    init{
-        firestore = FirebaseFirestore.getInstance()
+    init {
         firestore.firestoreSettings = FirebaseFirestoreSettings.Builder().build()
     }
 
     private fun listenToReminders() {
-        firestore.collection("reminders").addSnapshotListener {
-                snapshot, e ->
+        firestore.collection("reminders").addSnapshotListener { snapshot, e ->
             // Handle error
-            if(e != null){
+            if (e != null) {
                 Log.w("Listen failed", e)
                 return@addSnapshotListener
             }
             // Find the data
-            snapshot?.let{
+            snapshot?.let {
                 val allReminders = ArrayList<Reminder>()
                 val documents = snapshot.documents
-                documents.forEach{
+                documents.forEach {
                     val reminder = it.toObject(Reminder::class.java)
-                    if(reminder != null) {
+                    if (reminder != null) {
                         reminder?.let {
                             allReminders.add(it)
                         }
@@ -59,29 +57,29 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
         }
     }
 
-    fun fetchReminders(reminders: SnapshotStateList<Reminder>){
+    fun fetchReminders(reminders: SnapshotStateList<Reminder>) {
         firestore.collection("reminders").get().addOnSuccessListener {
             reminders.updateList(it.toObjects(Reminder::class.java))
-        }.addOnFailureListener{
+        }.addOnFailureListener {
             reminders.updateList(listOf())
         }
     }
+
     //Extention function of the one above, used to clear or add the List of reminders
     private fun <T> SnapshotStateList<T>.updateList(reminderList: List<T>) {
         clear()
         addAll(reminderList)
     }
 
-    fun saveReminders(reminder: Reminder){
-        val document =  if (reminder.title == null) {
+    fun saveReminders(reminder: Reminder) {
+        val document = if (reminder.title == null) {
             firestore.collection("reminders").document()
-        }
-        else {
+        } else {
             firestore.collection("reminders").document(reminder.title)
         }
         reminder.title = document.id
         val handle = document.set(reminder)
         handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
-        handle.addOnFailureListener { Log.e("Firebase", "Save Failed")}
+        handle.addOnFailureListener { Log.e("Firebase", "Save Failed") }
     }
 }

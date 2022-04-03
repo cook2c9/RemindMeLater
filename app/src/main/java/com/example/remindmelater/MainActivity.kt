@@ -236,15 +236,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @Composable
     fun ReminderRow(){
 
-        val reminders_ = remember { mutableStateListOf(Reminder()) }
+        val reminders = remember { mutableStateListOf(Reminder()) }
 
-        viewModel.fetchReminders(reminders_)
+        viewModel.fetchReminders(reminders)
 
         Row(
             modifier = Modifier.padding(vertical = 200.dp)
         ) {
             LazyColumn() {
-                items(reminders_) { item: Reminder ->
+                items(reminders) { item: Reminder ->
                     ReminderListItem(item, true)
                 }
             }

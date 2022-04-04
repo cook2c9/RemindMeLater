@@ -18,7 +18,6 @@ import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 @Composable
 fun ReminderListItem() {
 
-
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -1,24 +1,17 @@
 package com.example.remindmelater
 
-import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
 import com.example.remindmelater.dto.Reminder
 import com.example.remindmelater.service.IReminderService
 import com.example.remindmelater.service.ReminderService
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.firestore.*
-import com.google.firebase.firestore.EventListener
-import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.collections.ArrayList
 
 class MainViewModel(var reminderService : IReminderService = ReminderService()) : ViewModel() {

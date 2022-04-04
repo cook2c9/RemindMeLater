@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
 
-
 class ReminderAdapter(private val reminderList : ArrayList<Reminder>) : RecyclerView.Adapter<ReminderAdapter.ReminderVH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReminderAdapter.ReminderVH {
@@ -33,5 +32,4 @@ class ReminderAdapter(private val reminderList : ArrayList<Reminder>) : Recycler
         val reminderBody : TextView = itemView.findViewById<TextView>(R.id.tvReminderBody)
         val reminderFor : TextView = itemView.findViewById<TextView>(R.id.tvReminderFor)
     }
-
 }

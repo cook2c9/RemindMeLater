@@ -1,6 +1,8 @@
 package com.example.remindmelater
 
 import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -28,11 +30,8 @@ import com.example.remindmelater.dto.Reminder
 import com.example.remindmelater.service.ReminderServiceStub
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 import com.example.remindmelater.ui.theme.UpdateReminderDialog
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.Geofence
-import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -51,11 +50,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var geofencingClient: GeofencingClient
     private lateinit var mapView: View
     private var geofenceList = mutableListOf<Geofence>()
-    private var markerList =HashMap<String, Marker>()
+    private var markerList = HashMap<String, Marker>()
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var userLatitude = 0.0
     private var userLongitude = 0.0
 
+    private val geofencePendingIntent: PendingIntent by lazy {
+        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+        // addGeofences() and removeGeofences().
+        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +79,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     MainScreen()
                     isLocationPermissionGranted()
                     Map()
+                    createGeofence("sjkjsd", 39.1037, -84.51361, 500f)
+                    addGeofences()
                 }
             }
         }
@@ -198,7 +205,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     onClick = {
                         Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         Log.d("MESSAGE: ", "Map View Button Clicked")
-//                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
+//                        Toast.makeText(context,, Toast.LENGTH_LONG).show()
                         isVisible = false
                         showMap()
                         moveMapToUser()
@@ -384,5 +391,46 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val lat = loc["latitude"]
         val long = loc["longitude"]
         moveMapCamera(lat!!, long!!)
+    }
+
+    private fun getGeofencingRequest(): GeofencingRequest {
+        return GeofencingRequest.Builder().apply {
+            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            addGeofences(geofenceList)
+        }.build()
+    }
+
+    private fun createGeofence(id: String, lat: Double, long: Double, radius: Float) {
+        geofenceList.add(
+            Geofence.Builder()
+            // Set the request ID of the geofence. This is a string to identify this
+            // geofence.
+            .setRequestId(id)
+
+            // Set the circular region of this geofence.
+            .setCircularRegion(
+                lat,
+                long,
+                radius
+            )
+
+            // Set the expiration duration of the geofence. This geofence gets automatically
+            // removed after this period of time.
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+
+            // Set the transition types of interest. Alerts are only generated for these
+            // transition. We track entry and exit transitions in this sample.
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+
+            // Create the geofence.
+            .build())
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun addGeofences() {
+        if(isLocationPermissionGranted()) {
+            geofencingClient.addGeofences(getGeofencingRequest(), geofencePendingIntent)
+            Toast.makeText(this@MainActivity, "Geofences Added", Toast.LENGTH_LONG).show()
+        }
     }
 }

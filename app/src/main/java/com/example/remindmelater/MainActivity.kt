@@ -1,7 +1,6 @@
 package com.example.remindmelater
 
 import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -12,35 +11,26 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.material.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
-import com.example.remindmelater.dto.Reminder
 import androidx.core.app.ActivityCompat
-import com.example.remindmelater.databinding.ActivityMainBinding
 import com.example.remindmelater.databinding.ActivityMapsBinding
-
+import com.example.remindmelater.dto.Reminder
 import com.example.remindmelater.service.ReminderServiceStub
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 import com.example.remindmelater.ui.theme.UpdateReminderDialog
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -48,8 +38,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.firestore.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.runBlocking
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -58,16 +48,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var geofencingClient: GeofencingClient
     private lateinit var mapView: View
+    private var geofenceList = mutableListOf<Geofence>()
+    private var markerList =HashMap<String, Marker>()
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private var userLatitude = 0.0
     private var userLongitude = 0.0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        geofencingClient = LocationServices.getGeofencingClient(this)
 
         setContent {
             RemindMeLaterTheme {
@@ -294,40 +289,44 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this@MainActivity)
     }
 
-    fun hideMap() {
+    private fun hideMap() {
         mapView = findViewById(R.id.map_layout)
         mapView.visibility = View.INVISIBLE
     }
 
-    fun showMap() {
+    private fun showMap() {
         mapView = findViewById(R.id.map_layout)
         enableUserLocation(mMap)
         mapView.visibility = View.VISIBLE
     }
 
-    // Adds a map marker with a label at the given lat and long.
-    fun addMapMarker(label: String, lat: Double, long: Double) {
+    // Adds a map marker with a label at the given lat and long.  ALso adds the markers to a list so they can be removed
+    private fun addMapMarker(id: String, label: String, lat: Double, long: Double) {
         val loc = LatLng(lat, long)
-        mMap.addMarker(MarkerOptions().position(loc).title(label))
+        val tempMarker = mMap.addMarker(MarkerOptions().position(loc).title(label))
+        tempMarker?.let { markerList.put(id, it)}
+    }
+
+    private fun removeMapMarker(id: String) {
+        val marker = markerList[id]
+        marker?.remove()
     }
 
     // Moves camera location to given lat and long
-    fun moveMapCamera(lat: Double, long: Double) {
+    private fun moveMapCamera(lat: Double, long: Double) {
         mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, long)))
         mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
     }
 
-    suspend fun addSavedReminders() {
-        val savedReminders: List<Reminder>? = ReminderServiceStub().fetchReminders()
-        savedReminders?.let {
-            it.forEach { reminder ->
-                addMapMarker(reminder.title, reminder.latitude.toDouble(), reminder.longitude.toDouble())
-            }
+    private suspend fun addSavedReminders() {
+        val savedReminders: List<Reminder> = ReminderServiceStub().fetchReminders()
+        savedReminders.forEach { reminder ->
+                addMapMarker(reminder.id, reminder.title, reminder.latitude, reminder.longitude)
         }
     }
 
     // Checks whether all location permissions are granted and returns true or false
-    fun isLocationPermissionGranted(): Boolean {
+    private fun isLocationPermissionGranted(): Boolean {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION
@@ -342,7 +341,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // Sends a permission request to the user for the needed location permissions
-    fun requestLocationPermission() {
+    private fun requestLocationPermission() {
         ActivityCompat.requestPermissions(
             this,
             arrayOf(
@@ -355,8 +354,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     //Gets users current location if available
     @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
-    fun getCurrentLocation(): Map<String, Double> {
-        var token = CancellationTokenSource().token
+    private fun getCurrentLocation(): Map<String, Double> {
+        val token = CancellationTokenSource().token
 
         return if (isLocationPermissionGranted()) {
             fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, token)
@@ -380,10 +379,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    fun moveMapToUser() {
-        var loc = getCurrentLocation()
-        var lat = loc["latitude"]
-        var long = loc["longitude"]
+    private fun moveMapToUser() {
+        val loc = getCurrentLocation()
+        val lat = loc["latitude"]
+        val long = loc["longitude"]
         moveMapCamera(lat!!, long!!)
     }
 }

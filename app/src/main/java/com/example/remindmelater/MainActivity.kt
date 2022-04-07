@@ -241,7 +241,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         viewModel.fetchReminders(reminders_)
 
         Row(
-            modifier = Modifier.padding(vertical = 200.dp)
+            modifier = Modifier.padding(vertical = 20.dp)
         ) {
             LazyColumn() {
                 items(reminders_) { item: Reminder ->

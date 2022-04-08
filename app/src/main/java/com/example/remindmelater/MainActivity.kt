@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -25,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.remindmelater.databinding.ActivityMapsBinding
 import com.example.remindmelater.dto.Reminder
 import com.example.remindmelater.service.ReminderServiceStub
@@ -40,6 +44,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.CancellationTokenSource
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -48,6 +54,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var geofencingClient: GeofencingClient
+    private lateinit var geocoder: Geocoder
     private lateinit var mapView: View
     private var geofenceList = mutableListOf<Geofence>()
     private var markerList = HashMap<String, Marker>()
@@ -68,6 +75,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         geofencingClient = LocationServices.getGeofencingClient(this)
+        geocoder = Geocoder(this)
 
         setContent {
             RemindMeLaterTheme {
@@ -208,7 +216,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 //                        Toast.makeText(context,, Toast.LENGTH_LONG).show()
                         isVisible = false
                         showMap()
-                        moveMapToUser()
+                        lifecycleScope.launch { moveMapToUser()}
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -361,19 +369,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     //Gets users current location if available
     @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
-    private fun getCurrentLocation(): Map<String, Double> {
+    private suspend fun getCurrentLocation(): Location? {
         val token = CancellationTokenSource().token
+        val def = CompletableDeferred<Location>()
 
         return if (isLocationPermissionGranted()) {
             fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, token)
                 .addOnSuccessListener { loc ->
-                    userLatitude = loc.latitude
-                    userLongitude = loc.longitude
+                    def.complete(loc)
                 }
-            mapOf("latitude" to userLatitude, "longitude" to userLongitude)
+            def.await()
         } else {
             requestLocationPermission()
-            mapOf("latitude" to 10.0, "longitude" to 10.0)
+            null
         }
     }
 
@@ -386,11 +394,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun moveMapToUser() {
+    private suspend fun moveMapToUser() {
         val loc = getCurrentLocation()
-        val lat = loc["latitude"]
-        val long = loc["longitude"]
-        moveMapCamera(lat!!, long!!)
+        loc?.let { moveMapCamera(loc.latitude, loc.longitude) }
     }
 
     private fun getGeofencingRequest(): GeofencingRequest {
@@ -430,7 +436,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun addGeofences() {
         if(isLocationPermissionGranted()) {
             geofencingClient.addGeofences(getGeofencingRequest(), geofencePendingIntent)
-            Toast.makeText(this@MainActivity, "Geofences Added", Toast.LENGTH_LONG).show()
+            Log.i("Geofence", "Added")
         }
+    }
+
+    private fun addressAutoComplete(userInput: String): MutableList<Address>? {
+        return geocoder.getFromLocationName(userInput, 5)
     }
 }

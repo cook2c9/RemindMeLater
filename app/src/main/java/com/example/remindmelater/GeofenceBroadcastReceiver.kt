@@ -29,7 +29,7 @@ class GeofenceBroadcastReceiver: BroadcastReceiver() {
             // multiple geofences.
 //            val triggeringGeofences = geofencingEvent.triggeringGeofences
 
-            Log.d("Geofence: ", "Entered")
+            Log.i("Geofence", "Entered")
 
 
 

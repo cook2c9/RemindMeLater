@@ -255,32 +255,30 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     fun ReminderListItem(reminder: Reminder, isVisible: Boolean) {
         if(isVisible) {
             Log.d("Reminder List ", reminder.userEmail)
-            Column(
-
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Text(text = "Reminder: ${reminder.body}")
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .weight(6f)
                         .padding(0.dp)
                 ) {
+                    Text(text = "Reminder: ${reminder.body}")
                     Text(text = "Location: ")
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 4.dp, top = 0.dp),
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 4.dp, top = 0.dp)
-                    )
                     Text(text = "For: ${reminder.userEmail}")
                 }
-            }
-        }
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                ){
+                    IconButton(onClick = {/* Do Something*/ }) {
+                        Icon(Icons.Filled.Edit, null)
+                    }
+                    IconButton(onClick = {/* Do Something*/ }) {
+                        Icon(Icons.Filled.Delete, null)
+                    }
+                }
+            }        }
     }
 
     @Composable

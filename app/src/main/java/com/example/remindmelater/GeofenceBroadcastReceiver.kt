@@ -31,8 +31,6 @@ class GeofenceBroadcastReceiver: BroadcastReceiver() {
 
             Log.i("Geofence", "Entered")
 
-
-
         } else {
             // Log the error
         }

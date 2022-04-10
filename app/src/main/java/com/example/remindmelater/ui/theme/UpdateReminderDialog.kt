@@ -1,38 +1,117 @@
 package com.example.remindmelater.ui.theme
 
-import android.app.AlertDialog
-import android.text.Layout
-import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
+import android.location.Address
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.material.Surface
-import androidx.compose.runtime.MutableState
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.PopupProperties
 import com.example.remindmelater.R
 
 @Composable
 fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
 
+    var strSelectedData = ""
     val reminder = remember { mutableStateOf("") }
     val location = remember { mutableStateOf("") }
     val title = remember { mutableStateOf("") }
     val userEmail = remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester }
 
+    @Composable
+    fun TextFieldWithDropdown(
+        modifier: Modifier = Modifier,
+        value: TextFieldValue,
+        setValue: (TextFieldValue) -> Unit,
+        onDismissRequest: () -> Unit,
+        dropDownExpanded: Boolean,
+        list: List<Address>,
+        label: String = ""
+    ) {
+        Box(modifier) {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        if (!focusState.isFocused)
+                            onDismissRequest()
+                    },
+                value = value,
+                onValueChange = setValue,
+                label = { Text(label) },
+                colors = TextFieldDefaults.outlinedTextFieldColors()
+            )
+            DropdownMenu(
+                expanded = dropDownExpanded,
+                properties = PopupProperties(
+                    focusable = false,
+                    dismissOnBackPress = true,
+                    dismissOnClickOutside = true
+                ),
+                onDismissRequest = onDismissRequest
+            ) {
+                list.forEach { text ->
+                    DropdownMenuItem(onClick = {
+                        setValue(
+                            TextFieldValue(
+                                text.toString(),
+                                TextRange(text.toString().length)
+                            )
+                        )
+                    }) {
+                        Text(text = text.toString())
+                    }
+                }
+            }
+        }
+    }
+
+//    @Composable
+//    fun TextFieldWithDropdownUsage() {
+//
+//        val dropDownOptions = remember { mutableStateOf(listOf<Address>()) }
+//        val textFieldValue = remember { mutableStateOf(TextFieldValue()) }
+//        val dropDownExpanded = remember { mutableStateOf(false) }
+//
+//        fun onDropdownDismissRequest() {
+//            dropDownExpanded.value = false
+//        }
+//
+//        fun onValueChanged(value: TextFieldValue) {
+//            strSelectedData = value.text
+//            dropDownExpanded.value = true
+//            textFieldValue.value = value
+//            dropDownOptions.value = value.text
+//        }
+//
+//
+//        TextFieldWithDropdown(
+//            modifier = Modifier.fillMaxWidth(),
+//            value = textFieldValue.value,
+//            setValue = ::onValueChanged,
+//            onDismissRequest = ::onDropdownDismissRequest,
+//            dropDownExpanded = dropDownExpanded.value,
+//            list = dropDownOptions.value,
+//            label = "Label"
+//        )
+//    }
+//
     if (openDialog.value) {
         Dialog(onDismissRequest = { openDialog.value = false }) {
             Surface(
@@ -74,6 +153,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
 
                     Spacer(modifier = Modifier.padding(10.dp))
 
+//                    TextFieldWithDropdownUsage()
                     OutlinedTextField(
                         value = location.value,
                         onValueChange = { location.value = it },

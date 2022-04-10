@@ -1,7 +1,10 @@
 package com.example.remindmelater
 
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
@@ -28,6 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.remindmelater.databinding.ActivityMapsBinding
 import com.example.remindmelater.dto.Reminder
@@ -56,11 +61,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var geofencingClient: GeofencingClient
     private lateinit var geocoder: Geocoder
     private lateinit var mapView: View
+    private lateinit var notificationManager: NotificationManager
     private var geofenceList = mutableListOf<Geofence>()
     private var markerList = HashMap<String, Marker>()
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
-    private var userLatitude = 0.0
-    private var userLongitude = 0.0
+    private val CHANNELID = "1"
 
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
@@ -89,6 +94,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Map()
                     createGeofence("sjkjsd", 39.1037, -84.51361, 500f)
                     addGeofences()
+                    createNotificationChannel()
+                    showNotification("Title of Notification", "Content of Notification")
                 }
             }
         }
@@ -319,7 +326,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun addMapMarker(id: String, label: String, lat: Double, long: Double) {
         val loc = LatLng(lat, long)
         val tempMarker = mMap.addMarker(MarkerOptions().position(loc).title(label))
-        tempMarker?.let { markerList.put(id, it)}
+        tempMarker?.let { markerList.put(id, it) }
     }
 
     private fun removeMapMarker(id: String) {
@@ -336,7 +343,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private suspend fun addSavedReminders() {
         val savedReminders: List<Reminder> = ReminderServiceStub().fetchReminders()
         savedReminders.forEach { reminder ->
-                addMapMarker(reminder.id, reminder.title, reminder.latitude, reminder.longitude)
+                addMapMarker(reminder.geoID, reminder.title, reminder.latitude, reminder.longitude)
         }
     }
 
@@ -432,7 +439,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             .build())
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
     private fun addGeofences() {
         if(isLocationPermissionGranted()) {
             geofencingClient.addGeofences(getGeofencingRequest(), geofencePendingIntent)
@@ -440,7 +447,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun addressAutoComplete(userInput: String): MutableList<Address>? {
+    fun addressAutoComplete(userInput: String): List<Address> {
         return geocoder.getFromLocationName(userInput, 5)
+    }
+
+    private fun createNotificationChannel() {
+        val name = "Notification"
+        val descriptionText = "Description"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(CHANNELID, name, importance).apply {
+            description = descriptionText
+        }
+        // Register the channel with the system
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    fun showNotification(title: String, content: String) {
+
+        val builder = NotificationCompat.Builder(this, CHANNELID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+        with(NotificationManagerCompat.from(this)) {
+            notify(1, builder.build())
+        }
     }
 }

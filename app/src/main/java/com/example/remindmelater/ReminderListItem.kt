@@ -5,6 +5,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
@@ -32,7 +33,7 @@ fun ReminderListItem() {
                     horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(onClick = {/* Do Something*/ }) {
-                        Icon(Icons.Filled.Edit, null)
+                        Icon(Icons.Filled.Check, null)
                     }
                     IconButton(onClick = {/* Do Something*/ }) {
                         Icon(Icons.Filled.Delete, null)

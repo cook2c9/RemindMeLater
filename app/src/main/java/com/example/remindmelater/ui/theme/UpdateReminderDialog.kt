@@ -1,6 +1,6 @@
 package com.example.remindmelater.ui.theme
 
-import android.location.Address
+import android.location.Geocoder
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,17 +22,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
+import com.example.remindmelater.MainActivity
 import com.example.remindmelater.R
 
 @Composable
 fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
 
+    val geocoder = Geocoder(MainActivity.instance)
     var strSelectedData = ""
     val reminder = remember { mutableStateOf("") }
     val location = remember { mutableStateOf("") }
     val title = remember { mutableStateOf("") }
     val userEmail = remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester }
+
+    fun addressAutoComplete(userInput: String): List<String> {
+        return try {
+            geocoder.getFromLocationName(userInput, 5).map { it.getAddressLine(0) }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
 
     @Composable
     fun TextFieldWithDropdown(
@@ -41,7 +51,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
         setValue: (TextFieldValue) -> Unit,
         onDismissRequest: () -> Unit,
         dropDownExpanded: Boolean,
-        list: List<Address>,
+        list: List<String>,
         label: String = ""
     ) {
         Box(modifier) {
@@ -70,8 +80,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
                     DropdownMenuItem(onClick = {
                         setValue(
                             TextFieldValue(
-                                text.toString(),
-                                TextRange(text.toString().length)
+                                text,
+                                TextRange(text.length)
                             )
                         )
                     }) {
@@ -82,36 +92,36 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
         }
     }
 
-//    @Composable
-//    fun TextFieldWithDropdownUsage() {
-//
-//        val dropDownOptions = remember { mutableStateOf(listOf<Address>()) }
-//        val textFieldValue = remember { mutableStateOf(TextFieldValue()) }
-//        val dropDownExpanded = remember { mutableStateOf(false) }
-//
-//        fun onDropdownDismissRequest() {
-//            dropDownExpanded.value = false
-//        }
-//
-//        fun onValueChanged(value: TextFieldValue) {
-//            strSelectedData = value.text
-//            dropDownExpanded.value = true
-//            textFieldValue.value = value
-//            dropDownOptions.value = value.text
-//        }
-//
-//
-//        TextFieldWithDropdown(
-//            modifier = Modifier.fillMaxWidth(),
-//            value = textFieldValue.value,
-//            setValue = ::onValueChanged,
-//            onDismissRequest = ::onDropdownDismissRequest,
-//            dropDownExpanded = dropDownExpanded.value,
-//            list = dropDownOptions.value,
-//            label = "Label"
-//        )
-//    }
-//
+    @Composable
+    fun TextFieldWithDropdownUsage() {
+
+        val dropDownOptions = remember { mutableStateOf(listOf<String>()) }
+        val textFieldValue = remember { mutableStateOf(TextFieldValue()) }
+        val dropDownExpanded = remember { mutableStateOf(false) }
+
+        fun onDropdownDismissRequest() {
+            dropDownExpanded.value = false
+        }
+
+        fun onValueChanged(value: TextFieldValue) {
+            strSelectedData = value.text
+            dropDownExpanded.value = true
+            textFieldValue.value = value
+            dropDownOptions.value = addressAutoComplete(strSelectedData)
+        }
+
+
+        TextFieldWithDropdown(
+            modifier = Modifier.fillMaxWidth(),
+            value = textFieldValue.value,
+            setValue = ::onValueChanged,
+            onDismissRequest = ::onDropdownDismissRequest,
+            dropDownExpanded = dropDownExpanded.value,
+            list = dropDownOptions.value,
+            label = "Label"
+        )
+    }
+
     if (openDialog.value) {
         Dialog(onDismissRequest = { openDialog.value = false }) {
             Surface(
@@ -153,15 +163,15 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
 
                     Spacer(modifier = Modifier.padding(10.dp))
 
-//                    TextFieldWithDropdownUsage()
-                    OutlinedTextField(
-                        value = location.value,
-                        onValueChange = { location.value = it },
-                        label = { Text(text = "location") },
-                        placeholder = { Text(text = "location") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(0.8f)
-                    )
+                    TextFieldWithDropdownUsage()
+//                    OutlinedTextField(
+//                        value = location.value,
+//                        onValueChange = { location.value = it },
+//                        label = { Text(text = "location") },
+//                        placeholder = { Text(text = "location") },
+//                        singleLine = true,
+//                        modifier = Modifier.fillMaxWidth(0.8f)
+//                    )
 
                     Spacer(modifier = Modifier.padding(10.dp))
 

@@ -74,10 +74,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
+    companion object {
+        lateinit var instance: MainActivity
+            private set
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        instance = this
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         geofencingClient = LocationServices.getGeofencingClient(this)
         geocoder = Geocoder(this)
@@ -95,7 +101,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     createGeofence("sjkjsd", 39.1037, -84.51361, 500f)
                     addGeofences()
                     createNotificationChannel()
-                    showNotification("Title of Notification", "Content of Notification")
                 }
             }
         }
@@ -475,4 +480,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             notify(1, builder.build())
         }
     }
+
 }

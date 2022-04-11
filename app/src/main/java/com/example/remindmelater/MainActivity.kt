@@ -10,10 +10,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -27,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -241,7 +245,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         viewModel.fetchReminders(reminders_)
 
         Row(
-            modifier = Modifier.padding(vertical = 200.dp)
+            modifier = Modifier
+                .size(width = 400.dp, height = 500.dp)
+                .padding(top = 10.dp)
+
         ) {
             LazyColumn() {
                 items(reminders_) { item: Reminder ->
@@ -255,30 +262,61 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     fun ReminderListItem(reminder: Reminder, isVisible: Boolean) {
         if(isVisible) {
             Log.d("Reminder List ", reminder.userEmail)
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                Column(
-                    modifier = Modifier
-                        .weight(6f)
-                        .padding(0.dp)
+            Card(
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp).fillMaxWidth(),
+                elevation = 8.dp,
+                backgroundColor = Color.LightGray,
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(1.dp, Color.Black)
+            )
+            {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
-                    Text(text = "Reminder: ${reminder.body}")
-                    Text(text = "Location: ")
-                    Text(text = "For: ${reminder.userEmail}")
-                }
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                ){
-                    IconButton(onClick = {/* Do Something*/ }) {
-                        Icon(Icons.Filled.Edit, null)
+                    Column(
+                        modifier = Modifier
+                            .weight(6f)
+                            .padding(start = 2.dp)
+                    ) {
+                        Text(text = "Reminder: ${reminder.body}", fontWeight = FontWeight.Bold)
+                        Text(text = "Location: ")
+                        Text(text = "For: ${reminder.userEmail}")
+                        Text(text = "Range: ")
                     }
-                    IconButton(onClick = {/* Do Something*/ }) {
-                        Icon(Icons.Filled.Delete, null)
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        Button(
+                            onClick = {/* Do Something*/ },
+                            modifier = Modifier
+                                .padding(2.dp)
+
+                        ) {
+                            Icon(
+                                Icons.Filled.Edit,
+                                contentDescription = "Edit",
+                                modifier = Modifier
+                                    .background(color = Color.Blue)
+                            )
+                        }
+                        Button(
+                            onClick = {/* Do Something*/ },
+                            modifier = Modifier
+                                .padding(2.dp)
+
+                        ) {
+                            Icon(
+                                Icons.Filled.Delete,
+                                contentDescription = "Edit",
+                                modifier = Modifier
+                                    .background(color = Color.Blue)
+                            )
+                        }
                     }
                 }
-            }        }
+            }
+        }
     }
 
     @Composable

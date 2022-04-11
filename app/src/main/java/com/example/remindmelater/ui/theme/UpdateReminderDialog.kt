@@ -1,27 +1,25 @@
 package com.example.remindmelater.ui.theme
 
-import android.app.AlertDialog
-import android.text.Layout
-import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.material.Surface
-import androidx.compose.runtime.MutableState
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.remindmelater.R
 
 @Composable
@@ -106,41 +104,17 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
                     )
 
                     Spacer(modifier = Modifier.padding(15.dp))
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Button(
-                            onClick = {
-                                openDialog.value = false
-                            },
-                            modifier = Modifier
-                                //.fillMaxWidth(0.5f)
-                                .height(60.dp)
-                                .padding(10.dp),
-                            shape = RoundedCornerShape(5.dp),
-                            colors = ButtonDefaults.buttonColors(Purple500)
+                    Row(
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(onClick = {/* Do Something*/}
                         ) {
-                            Text(
-                                text = "Close",
-                                color = Color.White,
-                                fontSize = 12.sp
-                            )
-                            Button(
-                                onClick = {
-                                    openDialog.value = false
-                                },
-                                modifier = Modifier
-                                    //.fillMaxWidth(0.5f)
-                                    .height(60.dp)
-                                    .padding(10.dp),
-                                shape = RoundedCornerShape(5.dp),
-                                colors = ButtonDefaults.buttonColors(Purple500)
-                            ) {
-                                Text(
-                                    text = "Save",
-                                    color = Color.White,
-                                    fontSize = 12.sp
-                                )
-                            }
+                            Icon(Icons.Filled.Check, null, tint = Color(5, 115, 34))
                         }
+                        IconButton(onClick = {openDialog.value = false}) {
+                            Icon(Icons.Filled.Close, null, tint = Color.Red)
+                        }
+
                     }
                 }
             }

@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 text = "Hello, Set a Reminder for...",
                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
             )
-            UpdateReminderDialog(openDialog)
+            UpdateReminderDialog(openDialog, this@MainActivity)
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()

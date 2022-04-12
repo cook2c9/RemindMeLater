@@ -1,5 +1,6 @@
 package com.example.remindmelater.ui.theme
 
+import android.content.Context
 import android.location.Geocoder
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -22,13 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
-import com.example.remindmelater.MainActivity
 import com.example.remindmelater.R
 
 @Composable
-fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
+fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
 
-    val geocoder = Geocoder(MainActivity.instance)
+    val geocoder = Geocoder(context)
     var strSelectedData = ""
     val reminder = remember { mutableStateOf("") }
     val location = remember { mutableStateOf("") }
@@ -55,7 +55,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
         label: String = ""
     ) {
         Box(modifier) {
-            TextField(
+            OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .onFocusChanged { focusState ->
@@ -112,7 +112,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
 
 
         TextFieldWithDropdown(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(0.8f),
             value = textFieldValue.value,
             setValue = ::onValueChanged,
             onDismissRequest = ::onDropdownDismissRequest,

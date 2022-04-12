@@ -85,7 +85,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                             )
                         )
                     }) {
-                        Text(text = text.toString())
+                        Text(text = text)
                     }
                 }
             }
@@ -118,7 +118,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
             onDismissRequest = ::onDropdownDismissRequest,
             dropDownExpanded = dropDownExpanded.value,
             list = dropDownOptions.value,
-            label = "Label"
+            label = "Location"
         )
     }
 
@@ -178,8 +178,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     OutlinedTextField(
                         value = title.value,
                         onValueChange = { title.value = it },
-                        label = { Text(text = "title") },
-                        placeholder = { Text(text = "title") },
+                        label = { Text(text = "Title") },
+                        placeholder = { Text(text = "Title") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(0.8f)
                     )

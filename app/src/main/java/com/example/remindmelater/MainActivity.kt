@@ -7,8 +7,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -59,7 +57,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var geofencingClient: GeofencingClient
-    private lateinit var geocoder: Geocoder
     private lateinit var mapView: View
     private lateinit var notificationManager: NotificationManager
     private var geofenceList = mutableListOf<Geofence>()
@@ -74,19 +71,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
-    companion object {
-        lateinit var instance: MainActivity
-            private set
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        instance = this
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         geofencingClient = LocationServices.getGeofencingClient(this)
-        geocoder = Geocoder(this)
 
         setContent {
             RemindMeLaterTheme {
@@ -157,7 +148,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
 
-                         openDialog.value = true
+                        openDialog.value = true
 
                     },
                     modifier = Modifier
@@ -348,7 +339,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private suspend fun addSavedReminders() {
         val savedReminders: List<Reminder> = ReminderServiceStub().fetchReminders()
         savedReminders.forEach { reminder ->
-                addMapMarker(reminder.geoID, reminder.title, reminder.latitude, reminder.longitude)
+            addMapMarker(reminder.geoID, reminder.title, reminder.latitude, reminder.longitude)
         }
     }
 
@@ -418,30 +409,30 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }.build()
     }
 
-    private fun createGeofence(id: String, lat: Double, long: Double, radius: Float) {
+    private fun createGeofence(id: String, lat: Double, long: Double, radius: Float = 300f) {
         geofenceList.add(
             Geofence.Builder()
-            // Set the request ID of the geofence. This is a string to identify this
-            // geofence.
-            .setRequestId(id)
+                // Set the request ID of the geofence. This is a string to identify this
+                // geofence.
+                .setRequestId(id)
 
-            // Set the circular region of this geofence.
-            .setCircularRegion(
-                lat,
-                long,
-                radius
-            )
+                // Set the circular region of this geofence.
+                .setCircularRegion(
+                    lat,
+                    long,
+                    radius
+                )
 
-            // Set the expiration duration of the geofence. This geofence gets automatically
-            // removed after this period of time.
-            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                // Set the expiration duration of the geofence. This geofence gets automatically
+                // removed after this period of time.
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
 
-            // Set the transition types of interest. Alerts are only generated for these
-            // transition. We track entry and exit transitions in this sample.
-            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                // Set the transition types of interest. Alerts are only generated for these
+                // transition. We track entry and exit transitions in this sample.
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
 
-            // Create the geofence.
-            .build())
+                // Create the geofence.
+                .build())
     }
 
     @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
@@ -450,10 +441,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             geofencingClient.addGeofences(getGeofencingRequest(), geofencePendingIntent)
             Log.i("Geofence", "Added")
         }
-    }
-
-    fun addressAutoComplete(userInput: String): List<Address> {
-        return geocoder.getFromLocationName(userInput, 5)
     }
 
     private fun createNotificationChannel() {
@@ -480,5 +467,4 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             notify(1, builder.build())
         }
     }
-
 }

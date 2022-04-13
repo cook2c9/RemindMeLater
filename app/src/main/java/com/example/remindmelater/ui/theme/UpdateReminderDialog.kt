@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.remindmelater.R
+import com.example.remindmelater.dto.Reminder
+import com.example.remindmelater.MainViewModel
 
 @Composable
 fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
@@ -202,7 +204,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Row(
                         horizontalArrangement = Arrangement.End
                     ) {
-                        IconButton(onClick = {/* Do Something*/}
+                        IconButton(onClick = {saveNewReminder(reminder.value, location.value, title.value, userEmail.value)}
                         ) {
                             Icon(Icons.Filled.Check, null, tint = Color(5, 115, 34))
                         }
@@ -215,5 +217,18 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
             }
         }
     }
+}
+
+fun saveNewReminder(reminder: String, location : String, newTitle: String, email: String) {
+    val viewModel = MainViewModel()
+    val newReminder = Reminder()
+    newReminder.geoID = "sfdesfdedfa"
+    newReminder.longitude = location.toDouble()
+    newReminder.latitude = location.toDouble()
+    newReminder.body = reminder
+    newReminder.title = newTitle
+    newReminder.userEmail = email
+    newReminder.radius = 0
+    viewModel.saveReminders(newReminder)
 }
 

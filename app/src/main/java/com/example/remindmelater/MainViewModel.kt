@@ -73,13 +73,13 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
     }
 
     fun saveReminders(reminder: Reminder){
-        val document =  if (reminder.title == null) {
+        val document =  if (reminder.geoID == null) {
             firestore.collection("reminders").document()
         }
         else {
-            firestore.collection("reminders").document(reminder.title)
+            firestore.collection("reminders").document(reminder.geoID!!)
         }
-        reminder.title = document.id
+        reminder.geoID = document.id
         val handle = document.set(reminder)
         handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
         handle.addOnFailureListener { Log.e("Firebase", "Save Failed")}

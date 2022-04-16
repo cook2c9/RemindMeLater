@@ -307,28 +307,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         Button(
                             onClick = { openDialog.value = true },
                             modifier = Modifier
-                                .padding(2.dp)
+                                .padding(2.dp),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+
 
                         ) {
                             Icon(
                                 Icons.Filled.Edit,
                                 contentDescription = "Edit",
                                 modifier = Modifier
-                                    .background(color = Color.Blue)
+                                    .background(color = Color(12, 121, 230))
                             )
                         }
                         UpdateReminderDialog(openDialog, this@MainActivity)
                         Button(
                             onClick = {/* Do Something*/},
                             modifier = Modifier
-                                .padding(2.dp)
+                                .padding(2.dp),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+
 
                         ) {
                             Icon(
                                 Icons.Filled.Delete,
                                 contentDescription = "Delete",
                                 modifier = Modifier
-                                    .background(color = Color.Blue)
+                                    .background(color = Color(12, 121, 230))
                             )
                         }
                     }

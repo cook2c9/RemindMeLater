@@ -375,7 +375,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private suspend fun addSavedReminders() {
         val savedReminders: List<Reminder> = ReminderServiceStub().fetchReminders()
         savedReminders.forEach { reminder ->
-            addMapMarker(reminder.geoID, reminder.title, reminder.latitude, reminder.longitude)
+            addMapMarker(reminder.geoID!!, reminder.title, reminder.latitude, reminder.longitude)
         }
     }
 

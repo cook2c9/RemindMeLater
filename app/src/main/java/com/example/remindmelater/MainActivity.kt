@@ -273,6 +273,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @Composable
     fun ReminderListItem(reminder: Reminder, isVisible: Boolean) {
+        val context = LocalContext.current
+        val openDialog = remember {mutableStateOf(false)}
+        var isVisible by remember { mutableStateOf(true) }
+
         if(isVisible) {
             Log.d("Reminder List ", reminder.userEmail)
             Card(
@@ -301,7 +305,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             .weight(1f)
                     ) {
                         Button(
-                            onClick = {/* Do Something*/ },
+                            onClick = { openDialog.value = true },
                             modifier = Modifier
                                 .padding(2.dp)
 
@@ -313,15 +317,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                                     .background(color = Color.Blue)
                             )
                         }
+                        UpdateReminderDialog(openDialog, this@MainActivity)
                         Button(
-                            onClick = {/* Do Something*/ },
+                            onClick = {/* Do Something*/},
                             modifier = Modifier
                                 .padding(2.dp)
 
                         ) {
                             Icon(
                                 Icons.Filled.Delete,
-                                contentDescription = "Edit",
+                                contentDescription = "Delete",
                                 modifier = Modifier
                                     .background(color = Color.Blue)
                             )

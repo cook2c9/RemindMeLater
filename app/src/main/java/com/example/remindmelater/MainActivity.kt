@@ -273,6 +273,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @Composable
     fun ReminderListItem(reminder: Reminder, isVisible: Boolean) {
+        val context = LocalContext.current
+        val openDialog = remember {mutableStateOf(false)}
+        var isVisible by remember { mutableStateOf(true) }
+
         if(isVisible) {
             Log.d("Reminder List ", reminder.userEmail)
             Card(
@@ -301,29 +305,34 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             .weight(1f)
                     ) {
                         Button(
-                            onClick = {/* Do Something*/ },
+                            onClick = { openDialog.value = true },
                             modifier = Modifier
-                                .padding(2.dp)
+                                .padding(2.dp),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+
 
                         ) {
                             Icon(
                                 Icons.Filled.Edit,
                                 contentDescription = "Edit",
                                 modifier = Modifier
-                                    .background(color = Color.Blue)
+                                    .background(color = Color(12, 121, 230))
                             )
                         }
+                        UpdateReminderDialog(openDialog, this@MainActivity)
                         Button(
-                            onClick = {/* Do Something*/ },
+                            onClick = {/* Do Something*/},
                             modifier = Modifier
-                                .padding(2.dp)
+                                .padding(2.dp),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+
 
                         ) {
                             Icon(
                                 Icons.Filled.Delete,
-                                contentDescription = "Edit",
+                                contentDescription = "Delete",
                                 modifier = Modifier
-                                    .background(color = Color.Blue)
+                                    .background(color = Color(12, 121, 230))
                             )
                         }
                     }

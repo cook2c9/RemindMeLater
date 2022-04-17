@@ -21,25 +21,31 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.ViewModel
+import com.example.remindmelater.MainViewModel
 import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
-import com.example.remindmelater.MainViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 @Composable
 fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
 
+    val context = LocalContext.current
     val geocoder = Geocoder(context)
     var strSelectedData = ""
-    val reminder = remember { mutableStateOf("") }
+    var reminderValue = remember { mutableStateOf("") }
     val location = remember { mutableStateOf("") }
-    val title = remember { mutableStateOf("") }
-    val userEmail = remember { mutableStateOf("") }
+    var titleValue = remember { mutableStateOf("") }
+    var userEmailValue = remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester }
+    //val viewModel: MainViewModel by viewModel<MainViewModel>()
 
     fun addressAutoComplete(userInput: String): List<String> {
         return try {
@@ -158,8 +164,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     OutlinedTextField(
-                        value = reminder.value,
-                        onValueChange = { reminder.value = it },
+                        value = reminderValue.value,
+                        onValueChange = { reminderValue.value = it },
                         label = { Text(text = "Reminder") },
                         placeholder = { Text(text = "Reminder...") },
                         singleLine = true,
@@ -181,8 +187,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     OutlinedTextField(
-                        value = title.value,
-                        onValueChange = { title.value = it },
+                        value = titleValue.value,
+                        onValueChange = { titleValue.value = it },
                         label = { Text(text = "Title") },
                         placeholder = { Text(text = "Title") },
                         singleLine = true,
@@ -192,19 +198,27 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     OutlinedTextField(
-                        value = userEmail.value,
-                        onValueChange = { userEmail.value = it },
+                        value = userEmailValue.value,
+                        onValueChange = { userEmailValue.value = it },
                         label = { Text(text = "Email Address") },
                         placeholder = { Text(text = "Email Address") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(0.8f)
                     )
-
                     Spacer(modifier = Modifier.padding(15.dp))
                     Row(
                         horizontalArrangement = Arrangement.End
                     ) {
-                        IconButton(onClick = {saveNewReminder(reminder.value, location.value, title.value, userEmail.value)}
+
+                        IconButton(onClick = {
+                            var reminder = Reminder().apply{
+                                body = reminderValue.value
+                                title = titleValue.value
+                                userEmail = userEmailValue.value
+                            }
+                            MainViewModel().saveReminders(reminder)
+                        }
+
                         ) {
                             Icon(Icons.Filled.Check, null, tint = Color(5, 115, 34))
                         }

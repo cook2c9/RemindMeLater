@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     },
                     modifier = Modifier
                         .padding(4.dp)
-                        .width(190.dp)
+                        .width(400.dp)
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
                 ) {
@@ -167,29 +167,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         modifier = Modifier.padding(end = 4.dp)
                     )
                     Text(text = "Myself")
-                }
-                Button(
-                    onClick = {
-
-                        openDialog.value = true
-
-                    },
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .width(190.dp)
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                    )
-                    Text(text = "Others")
                 }
             }
             Row(

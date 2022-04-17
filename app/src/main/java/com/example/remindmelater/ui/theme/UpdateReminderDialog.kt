@@ -33,6 +33,7 @@ import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+
 @Composable
 fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
 
@@ -208,6 +209,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Row(
                         horizontalArrangement = Arrangement.End
                     ) {
+
                         IconButton(onClick = {
                             var reminder = Reminder().apply{
                                 body = reminderValue.value
@@ -216,6 +218,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                             }
                             MainViewModel().saveReminders(reminder)
                         }
+
                         ) {
                             Icon(Icons.Filled.Check, null, tint = Color(5, 115, 34))
                         }
@@ -228,5 +231,18 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
             }
         }
     }
+}
+
+fun saveNewReminder(reminder: String, location : String, newTitle: String, email: String) {
+    val viewModel = MainViewModel()
+    val newReminder = Reminder()
+    newReminder.geoID = "sfdesfdedfa"
+    newReminder.longitude = location.toDouble()
+    newReminder.latitude = location.toDouble()
+    newReminder.body = reminder
+    newReminder.title = newTitle
+    newReminder.userEmail = email
+    newReminder.radius = 0
+    viewModel.saveReminders(newReminder)
 }
 

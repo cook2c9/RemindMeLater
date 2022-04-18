@@ -21,7 +21,7 @@ class ReminderAdapter(private val reminderList : ArrayList<Reminder>) : Recycler
         val reminder = reminderList[position]
         holder.reminderTitle.text = reminder.title
         holder.reminderBody.text = reminder.body
-        holder.reminderFor.text = reminder.userEmail
+        holder.reminderFor.text = reminder.userID
     }
 
     override fun getItemCount(): Int {

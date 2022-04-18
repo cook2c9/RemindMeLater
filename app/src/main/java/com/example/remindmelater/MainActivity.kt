@@ -270,7 +270,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         var isVisible by remember { mutableStateOf(true) }
 
         if(isVisible) {
-            Log.d("Reminder List ", reminder.userEmail)
             Card(
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp).fillMaxWidth(),
                 elevation = 8.dp,
@@ -289,7 +288,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     ) {
                         Text(text = "Reminder: ${reminder.body}", fontWeight = FontWeight.Bold)
                         Text(text = "Location: ")
-                        Text(text = "For: ${reminder.userEmail}")
+                        Text(text = "For: ${reminder.userID}")
                         Text(text = "Range: ")
                     }
                     Column(
@@ -313,7 +312,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                         UpdateReminderDialog(openDialog, this@MainActivity)
                         Button(
-                            onClick = {/* Do Something*/},
+                            onClick = {
+                                Log.d("REMINDER", reminder.toString())
+                            },
                             modifier = Modifier
                                 .padding(2.dp),
                             colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))

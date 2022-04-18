@@ -17,15 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.PopupProperties
 import com.example.remindmelater.R
 
 @Composable
@@ -167,14 +167,6 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     TextFieldWithDropdownUsage()
-//                    OutlinedTextField(
-//                        value = location.value,
-//                        onValueChange = { location.value = it },
-//                        label = { Text(text = "location") },
-//                        placeholder = { Text(text = "location") },
-//                        singleLine = true,
-//                        modifier = Modifier.fillMaxWidth(0.8f)
-//                    )
 
                     Spacer(modifier = Modifier.padding(10.dp))
 

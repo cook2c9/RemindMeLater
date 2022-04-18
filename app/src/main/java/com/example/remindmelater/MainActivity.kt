@@ -51,6 +51,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -67,6 +69,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var markerList = HashMap<String, Marker>()
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private val CHANNELID = "1"
+    private val user = FirebaseAuth.getInstance().currentUser
 
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
@@ -141,7 +144,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 })
 
             Text(
-                text = "Hello, Set a Reminder for...",
+                text = "Hello, " + (user?.email ?: "User") + ". Set a Reminder for...",
                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
             )
             UpdateReminderDialog(openDialog, this@MainActivity)

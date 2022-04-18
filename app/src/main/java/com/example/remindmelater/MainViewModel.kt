@@ -1,21 +1,19 @@
 package com.example.remindmelater
 
-import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
 import com.example.remindmelater.dto.Reminder
 import com.example.remindmelater.service.IReminderService
 import com.example.remindmelater.service.ReminderService
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import kotlinx.coroutines.CompletableDeferred
 
 class MainViewModel(var reminderService : IReminderService = ReminderService()) : ViewModel() {
 
@@ -68,14 +66,36 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
         addAll(reminderList)
     }
 
+    suspend fun getUserReminders(userID: String) : List<Reminder>? {
+        val def = CompletableDeferred<List<Reminder>?>()
+        firestore.collection("reminders").get().addOnSuccessListener {
+            def.complete(it.toObjects(Reminder::class.java))
+            }
+        return def.await()
+    }
+
+    suspend fun getDocument(documentID: String) : Reminder? {
+        val def = CompletableDeferred<Reminder?>()
+        firestore.collection("reminders")
+            .document(documentID)
+            .get()
+            .addOnSuccessListener {
+                def.complete(it.toObject(Reminder::class.java))
+        }
+        return def.await()
+    }
+
     fun saveReminders(reminder: Reminder){
-        val document =  if (reminder.geoID == null) {
+        val document =  if (reminder.documentID == null || reminder.documentID.isEmpty()) {
             firestore.collection("reminders").document()
         }
         else {
-            firestore.collection("reminders").document(reminder.geoID!!)
+            firestore.collection("reminders").document(reminder.documentID!!)
         }
-        reminder.geoID = document.id
+        reminder.documentID = document.id
+        MainActivity().addMapMarker(reminder.documentID, reminder.title, reminder.latitude, reminder.longitude)
+//        MainActivity().createGeofence(reminder.documentID, reminder.latitude, reminder.longitude, reminder.radius.toFloat())
+//        MainActivity().addGeofences()
         val handle = document.set(reminder)
         handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
         handle.addOnFailureListener { Log.e("Firebase", "Save Failed")}

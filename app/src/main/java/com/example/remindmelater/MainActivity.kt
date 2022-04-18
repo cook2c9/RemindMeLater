@@ -37,7 +37,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.remindmelater.databinding.ActivityMapsBinding
 import com.example.remindmelater.dto.Reminder
-import com.example.remindmelater.service.ReminderServiceStub
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 import com.example.remindmelater.ui.theme.UpdateReminderDialog
 import com.google.android.gms.location.*
@@ -50,12 +49,11 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
+//    private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var geofencingClient: GeofencingClient
     private lateinit var mapView: View
@@ -89,6 +87,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     isLocationPermissionGranted()
                     Map()
                     createNotificationChannel()
+                    lifecycleScope.launch { addSavedRemindersGeofences() }
                 }
             }
         }
@@ -98,7 +97,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         enableUserLocation(mMap)
-        runBlocking { addSavedReminders() }
+        lifecycleScope.launch { addSavedRemindersMarkers() }
     }
 
     @Preview(showBackground = true)
@@ -136,7 +135,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 text = "Hello, Set a Reminder for...",
                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
             )
-            UpdateReminderDialog(openDialog, this@MainActivity)
+            UpdateReminderDialog(openDialog)
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
@@ -270,7 +269,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         var isVisible by remember { mutableStateOf(true) }
 
         if(isVisible) {
-            Log.d("Reminder List ", reminder.userEmail)
+            Log.d("Reminder List ", reminder.userID)
             Card(
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp).fillMaxWidth(),
                 elevation = 8.dp,
@@ -289,7 +288,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     ) {
                         Text(text = "Reminder: ${reminder.body}", fontWeight = FontWeight.Bold)
                         Text(text = "Location: ")
-                        Text(text = "For: ${reminder.userEmail}")
+                        Text(text = "For: ${reminder.userID}")
                         Text(text = "Range: ")
                     }
                     Column(
@@ -311,7 +310,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                                     .background(color = Color(12, 121, 230))
                             )
                         }
-                        UpdateReminderDialog(openDialog, this@MainActivity)
+                        UpdateReminderDialog(openDialog)
                         Button(
                             onClick = {/* Do Something*/},
                             modifier = Modifier
@@ -356,7 +355,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // Adds a map marker with a label at the given lat and long.  ALso adds the markers to a list so they can be removed
-    private fun addMapMarker(id: String, label: String, lat: Double, long: Double) {
+    internal fun addMapMarker(id: String, label: String, lat: Double, long: Double) {
         val loc = LatLng(lat, long)
         val tempMarker = mMap.addMarker(MarkerOptions().position(loc).title(label))
         tempMarker?.let { markerList.put(id, it) }
@@ -373,11 +372,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
     }
 
-    private suspend fun addSavedReminders() {
-        val savedReminders: List<Reminder> = ReminderServiceStub().fetchReminders()
-        savedReminders.forEach { reminder ->
-            addMapMarker(reminder.geoID!!, reminder.title, reminder.latitude, reminder.longitude)
+    private suspend fun addSavedRemindersMarkers() {
+        val savedReminders: List<Reminder>? = MainViewModel().getUserReminders("bbh7YOwFGbM8NFlDoWVtYmldVKg1")
+        savedReminders?.let { reminder ->
+            reminder.forEach { addMapMarker(it.documentID, it.title, it.latitude, it.longitude) }
         }
+    }
+
+    private suspend fun addSavedRemindersGeofences() {
+       val savedReminders = MainViewModel().getUserReminders("bbh7YOwFGbM8NFlDoWVtYmldVKg1")
+        savedReminders?.let { reminder ->
+            reminder.forEach { createGeofence(it.documentID, it.latitude, it.longitude, it.radius.toFloat())
+            }
+        }
+        addGeofences()
     }
 
 //     Checks whether all location permissions are granted and returns true or false
@@ -409,7 +417,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     //Gets users current location if available
     @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
-    private suspend fun getLastLocation(): Location? {
+    internal suspend fun getLastLocation(): Location? {
         val def = CompletableDeferred<Location>()
 
         return if (isLocationPermissionGranted()) {
@@ -492,6 +500,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     companion object {
+        lateinit var mMap: GoogleMap
+
         fun showNotification(con: Context, title: String, content: String) {
 
             val builder = NotificationCompat.Builder(con, "1")

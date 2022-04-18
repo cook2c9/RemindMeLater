@@ -257,17 +257,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         ) {
             LazyColumn() {
                 items(reminders_) { item: Reminder ->
-                    ReminderListItem(item, true)
+                    ReminderListItem(item)
                 }
             }
         }
     }
 
     @Composable
-    fun ReminderListItem(reminder: Reminder, isVisible: Boolean) {
-        val context = LocalContext.current
+    fun ReminderListItem(reminder: Reminder) {
         val openDialog = remember {mutableStateOf(false)}
-        var isVisible by remember { mutableStateOf(true) }
+        val isVisible by remember { mutableStateOf(true) }
 
         if(isVisible) {
             Card(
@@ -287,9 +286,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             .padding(start = 2.dp)
                     ) {
                         Text(text = "Reminder: ${reminder.body}", fontWeight = FontWeight.Bold)
-                        Text(text = "Location: ")
+                        Text(text = "Location: ${reminder.latitude} | ${reminder.longitude}")
                         Text(text = "For: ${reminder.userID}")
-                        Text(text = "Range: ")
+                        Text(text = "Range: ${reminder.radius}")
                     }
                     Column(
                         modifier = Modifier
@@ -300,8 +299,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             modifier = Modifier
                                 .padding(2.dp),
                             colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
-
-
                         ) {
                             Icon(
                                 Icons.Filled.Edit,
@@ -313,13 +310,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         UpdateReminderDialog(openDialog, this@MainActivity)
                         Button(
                             onClick = {
-                                Log.d("REMINDER", reminder.toString())
+                                viewModel.deleteReminder(reminder.geoID.toString())
                             },
                             modifier = Modifier
                                 .padding(2.dp),
                             colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
-
-
                         ) {
                             Icon(
                                 Icons.Filled.Delete,

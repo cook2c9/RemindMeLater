@@ -91,6 +91,6 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
     }
 
     fun deleteReminder(documentID: String) {
-
+        firestore.collection("reminders").document(documentID).delete()
     }
 }

@@ -25,7 +25,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -42,7 +41,6 @@ import com.example.remindmelater.service.ReminderServiceStub
 import com.example.remindmelater.ui.theme.RemindMeLaterTheme
 import com.example.remindmelater.ui.theme.UpdateReminderDialog
 import com.google.android.gms.location.*
-import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -50,7 +48,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -75,7 +72,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -89,17 +85,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Surface(
                     color = MaterialTheme.colors.background
                 ) {
-
                     MainScreen()
                     isLocationPermissionGranted()
                     Map()
-                    createGeofence("sjkjsd", 39.1037, -84.51361, 500f)
-                    addGeofences()
                     createNotificationChannel()
                 }
             }
         }
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -388,7 +380,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    // Checks whether all location permissions are granted and returns true or false
+//     Checks whether all location permissions are granted and returns true or false
     private fun isLocationPermissionGranted(): Boolean {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -417,12 +409,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     //Gets users current location if available
     @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
-    private suspend fun getCurrentLocation(): Location? {
-        val token = CancellationTokenSource().token
+    private suspend fun getLastLocation(): Location? {
         val def = CompletableDeferred<Location>()
 
         return if (isLocationPermissionGranted()) {
-            fusedLocationClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, token)
+            fusedLocationClient.lastLocation
                 .addOnSuccessListener { loc ->
                     def.complete(loc)
                 }
@@ -443,7 +434,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private suspend fun moveMapToUser() {
-        val loc = getCurrentLocation()
+        val loc = getLastLocation()
         loc?.let { moveMapCamera(loc.latitude, loc.longitude) }
     }
 
@@ -454,7 +445,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }.build()
     }
 
-    private fun createGeofence(id: String, lat: Double, long: Double, radius: Float = 300f) {
+    internal fun createGeofence(id: String, lat: Double, long: Double, radius: Float = 300f) {
         geofenceList.add(
             Geofence.Builder()
                 // Set the request ID of the geofence. This is a string to identify this
@@ -481,7 +472,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
-    private fun addGeofences() {
+    internal fun addGeofences() {
         if(isLocationPermissionGranted()) {
             geofencingClient.addGeofences(getGeofencingRequest(), geofencePendingIntent)
             Log.i("Geofence", "Added")
@@ -500,16 +491,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         notificationManager.createNotificationChannel(channel)
     }
 
-    fun showNotification(title: String, content: String) {
+    companion object {
+        fun showNotification(con: Context, title: String, content: String) {
 
-        val builder = NotificationCompat.Builder(this, CHANNELID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(title)
-            .setContentText(content)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            val builder = NotificationCompat.Builder(con, "1")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
-        with(NotificationManagerCompat.from(this)) {
-            notify(1, builder.build())
+            with(NotificationManagerCompat.from(con))
+            {
+                notify(1, builder.build())
+            }
         }
     }
 }

@@ -14,12 +14,8 @@ import com.example.remindmelater.ReminderRecyclerView.ReminderAdapter
 import com.example.remindmelater.dto.Reminder
 import com.example.remindmelater.service.IReminderService
 import com.example.remindmelater.service.ReminderService
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.firestore.*
-import com.google.firebase.firestore.EventListener
-import kotlinx.coroutines.launch
-import java.util.*
-import kotlin.collections.ArrayList
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 class MainViewModel(var reminderService : IReminderService = ReminderService()) : ViewModel() {
 

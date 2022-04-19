@@ -32,16 +32,15 @@ class GeofenceBroadcastReceiver(): BroadcastReceiver() {
             // Get the geofences that were triggered. A single event can trigger
             // multiple geofences.
             val triggeringGeofences = geofencingEvent.triggeringGeofences
-            triggeringGeofences?.let {
-                it.forEach { geofence ->
-                    goAsync(GlobalScope, Dispatchers.Default) {
+            goAsync(GlobalScope, Dispatchers.Main) {
+                triggeringGeofences.let {
+                    it.forEach { geofence ->
                         reminder = MainViewModel().getDocument(geofence.requestId)
                         reminder?.let { it -> showNotification(context!! , it.title, it.body) }
                     }
                 }
             }
             Log.i("Geofence", "Entered")
-        } else {
         }
     }
 

@@ -2,6 +2,7 @@ package com.example.remindmelater.ui.theme
 
 import android.location.Address
 import android.location.Geocoder
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,8 +55,13 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
         }
     }
 
-    fun addressLookup(input: String): Address {
-        return geocoder.getFromLocationName(input, 1).first()
+    fun addressLookup(input: String): Address? {
+        return try {
+            geocoder.getFromLocationName(input, 1).first()
+        } catch (e: Exception) {
+            null
+        }
+
     }
 
     @Composable
@@ -198,14 +204,19 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                     ) {
 
                         IconButton(onClick = {
-                            var reminder = Reminder().apply {
+                          val selectedAddress = addressLookup(strSelectedData)
+                          selectedAddress?.let {
+                            val reminder = Reminder().apply {
                                 body = reminderBody.value
                                 title = reminderTitle.value
-                                latitude = addressLookup(strSelectedData).latitude
-                                longitude = addressLookup(strSelectedData).longitude
+                                latitude = selectedAddress.latitude
+                                longitude = selectedAddress.longitude
                                 userID = auth.currentUser?.uid
                             }
-                            MainViewModel().checkIfReminderExists(documentID, reminder)
+                              MainViewModel().checkIfReminderExists(documentID, reminder)
+                              openDialog.value = false
+                          } ?: Toast.makeText(context,"A location needs to be selected", Toast.LENGTH_SHORT).show()
+
                         }
 
                         ) {

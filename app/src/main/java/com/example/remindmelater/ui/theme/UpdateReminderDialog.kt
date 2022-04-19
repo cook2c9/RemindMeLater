@@ -32,7 +32,6 @@ import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
 import com.google.firebase.auth.FirebaseAuth
 
-
 @Composable
 fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) {
 

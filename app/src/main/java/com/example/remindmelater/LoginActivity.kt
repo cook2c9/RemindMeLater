@@ -68,6 +68,7 @@ class LoginActivity : AppCompatActivity() {
         oAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener{
             when{
                 it.isSuccessful -> {
+                    signIn(email, password)
                     Log.d("Registered account with email", email)
                 }
                 else -> {

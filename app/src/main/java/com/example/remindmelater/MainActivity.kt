@@ -519,7 +519,4 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    //Icon(Icons.Filled.Menu, null)
-
-
 }

@@ -54,27 +54,22 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var geofencingClient: GeofencingClient
+
     private lateinit var mapView: View
     private lateinit var notificationManager: NotificationManager
-    private var geofenceList = mutableListOf<Geofence>()
-    private var markerList = HashMap<String, Marker>()
+
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private val CHANNELID = "1"
 
-    private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
-        // addGeofences() and removeGeofences().
-        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        geofencingClient = LocationServices.getGeofencingClient(this)
+        geofencingClient = LocationServices.getGeofencingClient(this.applicationContext)
+        staticContext = this.applicationContext
 
         setContent {
             RemindMeLaterTheme {
@@ -111,7 +106,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @Composable
     fun MainScreen() {
         val context = LocalContext.current
-        val openDialog = remember {mutableStateOf(false)}
+        val openDialog = remember { mutableStateOf(false) }
         var isVisible by remember { mutableStateOf(true) }
         Column {
             TopAppBar(
@@ -213,7 +208,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 //                        Toast.makeText(context,, Toast.LENGTH_LONG).show()
                         isVisible = false
                         showMap()
-                        lifecycleScope.launch { moveMapToUser()}
+                        lifecycleScope.launch { moveMapToUser() }
                     },
                     modifier = Modifier
                         .padding(4.dp)
@@ -229,7 +224,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Text(text = "Map View")
                 }
             }
-            if(isVisible) {
+            if (isVisible) {
                 ReminderRow()
             }
             Scaffold { innerPadding ->
@@ -241,7 +236,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @Composable
-    fun ReminderRow(){
+    fun ReminderRow() {
 
         val reminders_ = remember { mutableStateListOf(Reminder()) }
 
@@ -263,10 +258,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @Composable
     fun ReminderListItem(reminder: Reminder) {
-        val openDialog = remember {mutableStateOf(false)}
+        val openDialog = remember { mutableStateOf(false) }
         val isVisible by remember { mutableStateOf(true) }
 
-        if(isVisible) {
+        if (isVisible) {
             Card(
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp).fillMaxWidth(),
                 elevation = 8.dp,
@@ -296,7 +291,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             onClick = { openDialog.value = true },
                             modifier = Modifier
                                 .padding(2.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color(
+                                    12,
+                                    121,
+                                    230
+                                )
+                            )
                         ) {
                             Icon(
                                 Icons.Filled.Edit,
@@ -312,7 +313,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             },
                             modifier = Modifier
                                 .padding(2.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color(
+                                    12,
+                                    121,
+                                    230
+                                )
+                            )
                         ) {
                             Icon(
                                 Icons.Filled.Delete,
@@ -335,7 +342,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 //     Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this@MainActivity)
+        mapFragment.getMapAsync(this)
     }
 
     private fun hideMap() {
@@ -353,16 +360,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     internal fun addMapMarker(id: String, label: String, lat: Double, long: Double) {
         val loc = LatLng(lat, long)
         val tempMarker = mMap.addMarker(MarkerOptions().position(loc).title(label))
-        Log.i("Marker List", tempMarker.toString())
         tempMarker?.let { markerList.put(id, it) }
-        Log.i("Marker List", markerList.size.toString())
     }
 
     fun removeMapMarker(id: String) {
-        Log.i("Marker List", markerList.toString())
         val marker = markerList[id]
         marker?.remove()
-        Log.i("Marker List", markerList.toString())
+        markerList.remove(id)
     }
 
     // Moves camera location to given lat and long
@@ -379,9 +383,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private suspend fun addSavedRemindersGeofences() {
-       val savedReminders = MainViewModel().getUserReminders()
+        val savedReminders = MainViewModel().getUserReminders()
         savedReminders?.let { reminder ->
-            reminder.forEach { createGeofence(it.geoID, it.latitude, it.longitude, it.radius.toFloat())
+            reminder.forEach {
+                createGeofence(it.geoID, it.latitude, it.longitude, it.radius.toFloat())
                 Log.i("GeoID", it.geoID)
             }
         }
@@ -390,20 +395,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-//     Checks whether all location permissions are granted and returns true or false
-    private fun isLocationPermissionGranted(): Boolean {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return false
-        }
-        return true
-    }
+    //     Checks whether all location permissions are granted and returns true or false
+//    private fun isLocationPermissionGranted(): Boolean {
+//        if (ActivityCompat.checkSelfPermission(
+//                this,
+//                android.Manifest.permission.ACCESS_COARSE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+//                this,
+//                android.Manifest.permission.ACCESS_FINE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            return false
+//        }
+//        return true
+//    }
 
     // Sends a permission request to the user for the needed location permissions
     private fun requestLocationPermission() {
@@ -455,7 +460,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }.build()
     }
 
-    private fun createGeofence(id: String, lat: Double, long: Double, radius: Float = 300f) {
+    internal fun createGeofence(id: String, lat: Double, long: Double, radius: Float = 300f) {
         geofenceList.add(
             Geofence.Builder()
                 // Set the request ID of the geofence. This is a string to identify this
@@ -478,12 +483,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
 
                 // Create the geofence.
-                .build())
+                .build()
+        )
     }
 
     @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
     internal fun addGeofences() {
-        if(isLocationPermissionGranted()) {
+        if (isLocationPermissionGranted()) {
             geofencingClient.addGeofences(getGeofencingRequest(), geofencePendingIntent)
             Log.i("Geofence", "Added")
         }
@@ -501,8 +507,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         notificationManager.createNotificationChannel(channel)
     }
 
+    fun removeGeofence(documentID: String) {
+        geofenceList.removeIf { it.requestId == documentID }
+    }
+
     companion object {
         lateinit var mMap: GoogleMap
+        @SuppressLint("StaticFieldLeak")
+        lateinit var staticContext: Context
+        @SuppressLint("StaticFieldLeak")
+        lateinit var geofencingClient: GeofencingClient
+        var markerList = HashMap<String, Marker>()
+        var geofenceList = mutableListOf<Geofence>()
+
+        val geofencePendingIntent: PendingIntent by lazy {
+            val intent = Intent(staticContext, GeofenceBroadcastReceiver::class.java)
+            // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+            // addGeofences() and removeGeofences().
+            PendingIntent.getBroadcast(staticContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
 
         fun showNotification(con: Context, title: String, content: String) {
 
@@ -516,6 +539,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             {
                 notify(1, builder.build())
             }
+        }
+
+        fun isLocationPermissionGranted(): Boolean {
+            if (ActivityCompat.checkSelfPermission(
+                    staticContext,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    staticContext,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return false
+            }
+            return true
         }
     }
 }

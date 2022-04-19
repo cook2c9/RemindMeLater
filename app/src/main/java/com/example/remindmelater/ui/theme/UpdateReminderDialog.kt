@@ -30,6 +30,8 @@ import androidx.compose.ui.window.PopupProperties
 import com.example.remindmelater.MainViewModel
 import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
+import com.google.firebase.auth.FirebaseAuth
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @Composable
 fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
@@ -42,6 +44,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
     var reminderTitle = remember { mutableStateOf("") }
     var reminderUser = remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester }
+    //val viewModel: MainViewModel by viewModel<MainViewModel>()
+    var auth = FirebaseAuth.getInstance()
 
     fun addressAutoComplete(userInput: String): List<String> {
         return try {
@@ -207,17 +211,19 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
                                 title = reminderTitle.value
                                 latitude = addressLookup(strSelectedData).latitude
                                 longitude = addressLookup(strSelectedData).longitude
-                                userID = reminderUser.value
+                                userID = auth.currentUser?.uid
                             }
                             MainViewModel().saveReminders(reminder)
                         }
                         ) {
+                            //Save Reminder Button
                             Icon(Icons.Filled.Check, null, tint = Color(5, 115, 34))
                         }
-                        IconButton(onClick = { openDialog.value = false }) {
+                        //Close Window/Cancel
+                        IconButton(onClick = {openDialog.value = false}) {
+
                             Icon(Icons.Filled.Close, null, tint = Color.Red)
                         }
-
                     }
                 }
             }

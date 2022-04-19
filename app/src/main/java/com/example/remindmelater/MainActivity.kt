@@ -28,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -104,7 +106,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     fun DefaultPreview() {
         RemindMeLaterTheme {
             MainScreen()
-            ReminderRow()
         }
     }
 
@@ -121,11 +122,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 },
                 backgroundColor = Color(105, 208, 225),
                 navigationIcon = {
-                    IconButton(onClick = {/* Do Something*/ }) {
-                        Icon(Icons.Filled.Menu, null)
+                    IconButton(onClick = {signOut()}) {
+                        Icon(Icons.Default.Logout, null)
                     }
                 }, actions = {
-                    IconButton(onClick = { /*showDialog.value = true*/ }) {
+                    IconButton(onClick = {
+                        Log.d("Button", "Pushed")
+                    }) {
                         Icon(Icons.Filled.Settings, null)
                     }
                 })
@@ -268,7 +271,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if(isVisible) {
             Card(
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(horizontal = 4.dp, vertical = 4.dp)
+                    .fillMaxWidth(),
                 elevation = 8.dp,
                 backgroundColor = Color.LightGray,
                 shape = RoundedCornerShape(10.dp),
@@ -517,5 +522,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 notify(1, builder.build())
             }
         }
+    }
+    fun signOut() {
+        FirebaseAuth.getInstance().signOut()
+        val loginScreen = Intent(this@MainActivity, LoginActivity::class.java)
+        startActivity(loginScreen)
     }
 }

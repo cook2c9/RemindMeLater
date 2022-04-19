@@ -31,7 +31,6 @@ import com.example.remindmelater.MainViewModel
 import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
 import com.google.firebase.auth.FirebaseAuth
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @Composable
 fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
@@ -39,13 +38,13 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
     val context = LocalContext.current
     val geocoder = Geocoder(context)
     var strSelectedData = ""
-    var reminderBody = remember { mutableStateOf("") }
+    val reminderBody = remember { mutableStateOf("") }
     val location = remember { mutableStateOf("") }
-    var reminderTitle = remember { mutableStateOf("") }
-    var reminderUser = remember { mutableStateOf("") }
+    val reminderTitle = remember { mutableStateOf("") }
+    val reminderUser = remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester }
     //val viewModel: MainViewModel by viewModel<MainViewModel>()
-    var auth = FirebaseAuth.getInstance()
+    val auth = FirebaseAuth.getInstance()
 
     fun addressAutoComplete(userInput: String): List<String> {
         return try {

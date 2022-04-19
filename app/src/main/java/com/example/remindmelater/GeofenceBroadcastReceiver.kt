@@ -45,7 +45,7 @@ class GeofenceBroadcastReceiver(): BroadcastReceiver() {
         }
     }
 
-    fun BroadcastReceiver.goAsync(
+    private fun BroadcastReceiver.goAsync(
         coroutineScope: CoroutineScope,
         dispatcher: CoroutineDispatcher,
         block: suspend () -> Unit

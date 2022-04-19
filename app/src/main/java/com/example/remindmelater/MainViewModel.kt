@@ -45,10 +45,8 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
                 val documents = snapshot.documents
                 documents.forEach{
                     val reminder = it.toObject(Reminder::class.java)
-                    if(reminder != null) {
-                        reminder?.let {
-                            allReminders.add(it)
-                        }
+                    reminder?.let {
+                        allReminders.add(it)
                     }
                 }
                 reminders.value = allReminders
@@ -57,7 +55,7 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
     }
 
     fun fetchReminders(reminders: SnapshotStateList<Reminder>){
-        var currentUser = auth.currentUser
+        val currentUser = auth.currentUser
 
         currentUser?.let {
             Log.d("Reminder Found For User",it.uid)
@@ -75,11 +73,13 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
         addAll(reminderList)
     }
 
-    suspend fun getUserReminders(userID: String) : List<Reminder>? {
+    suspend fun getUserReminders() : List<Reminder>? {
         val def = CompletableDeferred<List<Reminder>?>()
-        firestore.collection("reminders").get().addOnSuccessListener {
-            def.complete(it.toObjects(Reminder::class.java))
-            }
+        val user = auth.currentUser
+            firestore.collection("reminders").whereEqualTo("userID", user?.uid).get()
+                .addOnSuccessListener {
+                    def.complete(it.toObjects(Reminder::class.java))
+                }
         return def.await()
     }
 
@@ -95,14 +95,14 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
     }
 
     fun saveReminders(reminder: Reminder){
-        val document =  if (reminder.documentID == null || reminder.documentID.isEmpty()) {
+        val document =  if (reminder.geoID.isEmpty()) {
             firestore.collection("reminders").document()
         }
         else {
-            firestore.collection("reminders").document(reminder.documentID!!)
+            firestore.collection("reminders").document(reminder.geoID)
         }
-        reminder.documentID = document.id
-        MainActivity().addMapMarker(reminder.documentID, reminder.title, reminder.latitude, reminder.longitude)
+        reminder.geoID = document.id
+        MainActivity().addMapMarker(reminder.geoID, reminder.title, reminder.latitude, reminder.longitude)
 //        MainActivity().createGeofence(reminder.documentID, reminder.latitude, reminder.longitude, reminder.radius.toFloat())
 //        MainActivity().addGeofences()
         val handle = document.set(reminder)
@@ -112,5 +112,6 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
 
     fun deleteReminder(documentID: String) {
         firestore.collection("reminders").document(documentID).delete()
+        MainActivity().removeMapMarker(documentID)
     }
 }

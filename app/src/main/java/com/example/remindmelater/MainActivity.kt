@@ -53,7 +53,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
-//    private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var geofencingClient: GeofencingClient
     private lateinit var mapView: View
@@ -354,12 +353,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     internal fun addMapMarker(id: String, label: String, lat: Double, long: Double) {
         val loc = LatLng(lat, long)
         val tempMarker = mMap.addMarker(MarkerOptions().position(loc).title(label))
+        Log.i("Marker List", tempMarker.toString())
         tempMarker?.let { markerList.put(id, it) }
+        Log.i("Marker List", markerList.size.toString())
     }
 
-    private fun removeMapMarker(id: String) {
+    fun removeMapMarker(id: String) {
+        Log.i("Marker List", markerList.toString())
         val marker = markerList[id]
         marker?.remove()
+        Log.i("Marker List", markerList.toString())
     }
 
     // Moves camera location to given lat and long
@@ -369,19 +372,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private suspend fun addSavedRemindersMarkers() {
-        val savedReminders: List<Reminder>? = MainViewModel().getUserReminders("bbh7YOwFGbM8NFlDoWVtYmldVKg1")
+        val savedReminders: List<Reminder>? = MainViewModel().getUserReminders()
         savedReminders?.let { reminder ->
-            reminder.forEach { addMapMarker(it.documentID, it.title, it.latitude, it.longitude) }
+            reminder.forEach { addMapMarker(it.geoID, it.title, it.latitude, it.longitude) }
         }
     }
 
     private suspend fun addSavedRemindersGeofences() {
-       val savedReminders = MainViewModel().getUserReminders("bbh7YOwFGbM8NFlDoWVtYmldVKg1")
+       val savedReminders = MainViewModel().getUserReminders()
         savedReminders?.let { reminder ->
-            reminder.forEach { createGeofence(it.documentID, it.latitude, it.longitude, it.radius.toFloat())
+            reminder.forEach { createGeofence(it.geoID, it.latitude, it.longitude, it.radius.toFloat())
+                Log.i("GeoID", it.geoID)
             }
         }
-        addGeofences()
+        if (geofenceList.isNotEmpty()) {
+            addGeofences()
+        }
     }
 
 //     Checks whether all location permissions are granted and returns true or false
@@ -449,7 +455,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }.build()
     }
 
-    internal fun createGeofence(id: String, lat: Double, long: Double, radius: Float = 300f) {
+    private fun createGeofence(id: String, lat: Double, long: Double, radius: Float = 300f) {
         geofenceList.add(
             Geofence.Builder()
                 // Set the request ID of the geofence. This is a string to identify this

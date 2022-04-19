@@ -2,6 +2,7 @@ package com.example.remindmelater.ui.theme
 
 import android.location.Address
 import android.location.Geocoder
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -55,8 +56,13 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
         }
     }
 
-    fun addressLookup(input: String): Address {
-        return geocoder.getFromLocationName(input, 1).first()
+    fun addressLookup(input: String): Address? {
+        return try {
+            geocoder.getFromLocationName(input, 1).first()
+        } catch (e: Exception) {
+            null
+        }
+
     }
 
     @Composable
@@ -193,20 +199,14 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
 
                     Spacer(modifier = Modifier.padding(10.dp))
 
-                    OutlinedTextField(
-                        value = reminderUser.value,
-                        onValueChange = { reminderUser.value = it },
-                        label = { Text(text = "Email Address") },
-                        placeholder = { Text(text = "Email Address") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(0.8f)
-                    )
                     Spacer(modifier = Modifier.padding(15.dp))
                     Row(
                         horizontalArrangement = Arrangement.End
                     ) {
 
                         IconButton(onClick = {
+                          val selectedAddress = addressLookup(strSelectedData)
+                          selectedAddress?.let {
                             var reminder = Reminder().apply {
                                 body = reminderBody.value
                                 title = reminderTitle.value
@@ -214,6 +214,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                                 longitude = addressLookup(strSelectedData).longitude
                                 userID = auth.currentUser?.uid
                             }
+                            openDialog.value = false
+                          } ?: Toast.makeText(context,"A location needs to be selected", Toast.LENGTH_SHORT).show()
                             MainViewModel().checkIfReminderExists(documentID, reminder)
                         }
 

@@ -193,14 +193,6 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
 
                     Spacer(modifier = Modifier.padding(10.dp))
 
-                    OutlinedTextField(
-                        value = reminderUser.value,
-                        onValueChange = { reminderUser.value = it },
-                        label = { Text(text = "Email Address") },
-                        placeholder = { Text(text = "Email Address") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(0.8f)
-                    )
                     Spacer(modifier = Modifier.padding(15.dp))
                     Row(
                         horizontalArrangement = Arrangement.End

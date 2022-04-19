@@ -1,6 +1,6 @@
 package com.example.remindmelater.ui.theme
 
-import android.content.Context
+import android.location.Address
 import android.location.Geocoder
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -17,35 +17,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.ViewModel
+import androidx.compose.ui.window.PopupProperties
 import com.example.remindmelater.MainViewModel
 import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
-fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
+fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) {
 
     val context = LocalContext.current
     val geocoder = Geocoder(context)
     var strSelectedData = ""
-    var reminderValue = remember { mutableStateOf("") }
+    val reminderBody = remember { mutableStateOf("") }
     val location = remember { mutableStateOf("") }
-    var titleValue = remember { mutableStateOf("") }
-    var userEmailValue = remember { mutableStateOf("") }
+    val reminderTitle = remember { mutableStateOf("") }
+    val reminderUser = remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester }
     //val viewModel: MainViewModel by viewModel<MainViewModel>()
+    val auth = FirebaseAuth.getInstance()
 
     fun addressAutoComplete(userInput: String): List<String> {
         return try {
@@ -53,6 +53,10 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    fun addressLookup(input: String): Address {
+        return geocoder.getFromLocationName(input, 1).first()
     }
 
     @Composable
@@ -164,8 +168,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     OutlinedTextField(
-                        value = reminderValue.value,
-                        onValueChange = { reminderValue.value = it },
+                        value = reminderBody.value,
+                        onValueChange = { reminderBody.value = it },
                         label = { Text(text = "Reminder") },
                         placeholder = { Text(text = "Reminder...") },
                         singleLine = true,
@@ -175,20 +179,12 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     TextFieldWithDropdownUsage()
-//                    OutlinedTextField(
-//                        value = location.value,
-//                        onValueChange = { location.value = it },
-//                        label = { Text(text = "location") },
-//                        placeholder = { Text(text = "location") },
-//                        singleLine = true,
-//                        modifier = Modifier.fillMaxWidth(0.8f)
-//                    )
 
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     OutlinedTextField(
-                        value = titleValue.value,
-                        onValueChange = { titleValue.value = it },
+                        value = reminderTitle.value,
+                        onValueChange = { reminderTitle.value = it },
                         label = { Text(text = "Title") },
                         placeholder = { Text(text = "Title") },
                         singleLine = true,
@@ -198,8 +194,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     OutlinedTextField(
-                        value = userEmailValue.value,
-                        onValueChange = { userEmailValue.value = it },
+                        value = reminderUser.value,
+                        onValueChange = { reminderUser.value = it },
                         label = { Text(text = "Email Address") },
                         placeholder = { Text(text = "Email Address") },
                         singleLine = true,
@@ -211,21 +207,25 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     ) {
 
                         IconButton(onClick = {
-                            var reminder = Reminder().apply{
-                                body = reminderValue.value
-                                title = titleValue.value
-                                userEmail = userEmailValue.value
+                            var reminder = Reminder().apply {
+                                body = reminderBody.value
+                                title = reminderTitle.value
+                                latitude = addressLookup(strSelectedData).latitude
+                                longitude = addressLookup(strSelectedData).longitude
+                                userID = auth.currentUser?.uid
                             }
-                            MainViewModel().saveReminders(reminder)
+                            MainViewModel().checkIfReminderExists(documentID, reminder)
                         }
 
                         ) {
+                            //Save Reminder Button
                             Icon(Icons.Filled.Check, null, tint = Color(5, 115, 34))
                         }
+                        //Close Window/Cancel
                         IconButton(onClick = {openDialog.value = false}) {
+
                             Icon(Icons.Filled.Close, null, tint = Color.Red)
                         }
-
                     }
                 }
             }

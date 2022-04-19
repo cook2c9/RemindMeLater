@@ -123,6 +123,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val context = LocalContext.current
         val openDialog = remember {mutableStateOf(false)}
         var isVisible by remember { mutableStateOf(true) }
+        var showMenu by remember { mutableStateOf(false)}
         Column {
             TopAppBar(
                 elevation = 4.dp,
@@ -130,13 +131,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     Text("Remind Me Later")
                 },
                 backgroundColor = Color(105, 208, 225),
-                navigationIcon = {
-                    IconButton(onClick = {/* Do Something*/ }) {
+                actions = {
+                    IconButton(onClick = { showMenu = !showMenu}) {
                         Icon(Icons.Filled.Menu, null)
                     }
-                }, actions = {
-                    IconButton(onClick = { /*showDialog.value = true*/ }) {
-                        Icon(Icons.Filled.Settings, null)
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false },
+                        modifier = Modifier.background(Color.LightGray)
+                    ){
+                        DropdownMenuItem(onClick ={/*Logout function here*/}){
+                            Text(text = "Logout")
+                        }
                     }
                 })
 
@@ -512,4 +518,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             notify(1, builder.build())
         }
     }
+
+    //Icon(Icons.Filled.Menu, null)
+
+
 }

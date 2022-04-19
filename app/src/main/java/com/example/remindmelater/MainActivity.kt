@@ -28,8 +28,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,6 +51,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.compose.material.Icon
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -60,8 +59,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mapView: View
     private lateinit var notificationManager: NotificationManager
     private val user = FirebaseAuth.getInstance().currentUser
-    private val viewModel: MainViewModel by viewModel<MainViewModel>()
-    private val CHANNELID = "1"
+    private val viewModel: MainViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,7 +101,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @Composable
     fun MainScreen() {
-        val context = LocalContext.current
         val openDialog = remember { mutableStateOf(false) }
         var isVisible by remember { mutableStateOf(true) }
         Column {
@@ -115,7 +112,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 backgroundColor = Color(105, 208, 225),
                 navigationIcon = {
                     IconButton(onClick = {signOut()}) {
-                        Icon(Icons.Default.Logout, null)
+                        Icon(Icons.Filled.Logout, null)
                     }
                 }, actions = {
                     IconButton(onClick = {
@@ -202,8 +199,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             if (isVisible) {
                 ReminderRow()
             }
-            Scaffold { innerPadding ->
-                Column() {
+            Scaffold {
+                Column {
 
                 }
             }
@@ -213,9 +210,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     @Composable
     fun ReminderRow() {
 
-        val reminders_ = remember { mutableStateListOf(Reminder()) }
+        val reminders = remember { mutableStateListOf(Reminder()) }
 
-        viewModel.fetchReminders(reminders_)
+        viewModel.fetchReminders(reminders)
 
         Row(
             modifier = Modifier
@@ -223,8 +220,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 .padding(top = 10.dp)
 
         ) {
-            LazyColumn() {
-                items(reminders_) { item: Reminder ->
+            LazyColumn {
+                items(reminders) { item: Reminder ->
                     ReminderListItem(item)
                 }
             }
@@ -477,12 +474,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         geofenceList.removeIf { it.requestId == documentID }
     }
 
+    private fun signOut() {
+        FirebaseAuth.getInstance().signOut()
+        val loginScreen = Intent(this@MainActivity, LoginActivity::class.java)
+        startActivity(loginScreen)
+    }
+
     companion object {
         lateinit var mMap: GoogleMap
         @SuppressLint("StaticFieldLeak")
         lateinit var staticContext: Context
         @SuppressLint("StaticFieldLeak")
         lateinit var geofencingClient: GeofencingClient
+        private const val CHANNELID = "1"
         var markerList = HashMap<String, Marker>()
         var geofenceList = mutableListOf<Geofence>()
 
@@ -521,10 +525,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             return false
         }
-    }
-    fun signOut() {
-        FirebaseAuth.getInstance().signOut()
-        val loginScreen = Intent(this@MainActivity, LoginActivity::class.java)
-        startActivity(loginScreen)
+
+
     }
 }

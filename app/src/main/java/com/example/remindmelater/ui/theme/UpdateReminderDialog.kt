@@ -33,8 +33,9 @@ import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
 import com.google.firebase.auth.FirebaseAuth
 
+
 @Composable
-fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
+fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) {
 
     val context = LocalContext.current
     val geocoder = Geocoder(context)
@@ -198,32 +199,26 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
 
                     Spacer(modifier = Modifier.padding(10.dp))
 
-                    OutlinedTextField(
-                        value = reminderUser.value,
-                        onValueChange = { reminderUser.value = it },
-                        label = { Text(text = "Email Address") },
-                        placeholder = { Text(text = "Email Address") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(0.8f)
-                    )
                     Spacer(modifier = Modifier.padding(15.dp))
                     Row(
                         horizontalArrangement = Arrangement.End
                     ) {
+
                         IconButton(onClick = {
-                            val selectedAddress = addressLookup(strSelectedData)
-                            selectedAddress?.let {
-                                val reminder = Reminder().apply {
-                                    body = reminderBody.value
-                                    title = reminderTitle.value
-                                    latitude = selectedAddress.latitude
-                                    longitude = selectedAddress.longitude
-                                    userID = auth.currentUser?.uid
-                                }
-                                MainViewModel().saveReminders(reminder)
-                                openDialog.value = false
-                            } ?: Toast.makeText(context,"A location needs to be selected", Toast.LENGTH_SHORT).show()
+                          val selectedAddress = addressLookup(strSelectedData)
+                          selectedAddress?.let {
+                            var reminder = Reminder().apply {
+                                body = reminderBody.value
+                                title = reminderTitle.value
+                                latitude = addressLookup(strSelectedData).latitude
+                                longitude = addressLookup(strSelectedData).longitude
+                                userID = auth.currentUser?.uid
+                            }
+                            openDialog.value = false
+                          } ?: Toast.makeText(context,"A location needs to be selected", Toast.LENGTH_SHORT).show()
+                            MainViewModel().checkIfReminderExists(documentID, reminder)
                         }
+
                         ) {
                             //Save Reminder Button
                             Icon(Icons.Filled.Check, null, tint = Color(5, 115, 34))
@@ -239,4 +234,5 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
         }
     }
 }
+
 

@@ -207,16 +207,17 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                         IconButton(onClick = {
                           val selectedAddress = addressLookup(strSelectedData)
                           selectedAddress?.let {
-                            var reminder = Reminder().apply {
+                            val reminder = Reminder().apply {
                                 body = reminderBody.value
                                 title = reminderTitle.value
-                                latitude = addressLookup(strSelectedData).latitude
-                                longitude = addressLookup(strSelectedData).longitude
+                                latitude = selectedAddress.latitude
+                                longitude = selectedAddress.longitude
                                 userID = auth.currentUser?.uid
                             }
-                            openDialog.value = false
+                              MainViewModel().checkIfReminderExists(documentID, reminder)
+                              openDialog.value = false
                           } ?: Toast.makeText(context,"A location needs to be selected", Toast.LENGTH_SHORT).show()
-                            MainViewModel().checkIfReminderExists(documentID, reminder)
+
                         }
 
                         ) {

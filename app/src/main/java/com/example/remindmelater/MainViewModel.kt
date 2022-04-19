@@ -71,8 +71,8 @@ class MainViewModel() : ViewModel() {
         }
         reminder.geoID = document.id
         MainActivity().addMapMarker(reminder.geoID, reminder.title, reminder.latitude, reminder.longitude)
-//        MainActivity().createGeofence(reminder.documentID, reminder.latitude, reminder.longitude, reminder.radius.toFloat())
-//        MainActivity().addGeofences()
+        MainActivity().createGeofence(reminder.geoID, reminder.latitude, reminder.longitude, reminder.radius.toFloat())
+        MainActivity().addGeofences()
         val handle = document.set(reminder)
         handle.addOnSuccessListener { Log.d("Firebase", "Document Saved") }
         handle.addOnFailureListener { Log.e("Firebase", "Save Failed")}
@@ -81,6 +81,7 @@ class MainViewModel() : ViewModel() {
     fun deleteReminder(documentID: String) {
         firestore.collection("reminders").document(documentID).delete()
         MainActivity().removeMapMarker(documentID)
+        MainActivity().removeGeofence(documentID)
     }
 
     fun updateReminder(documentID: String, reminder: Reminder){

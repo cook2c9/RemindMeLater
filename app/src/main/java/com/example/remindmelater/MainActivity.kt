@@ -57,9 +57,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-
     private lateinit var mapView: View
     private lateinit var notificationManager: NotificationManager
+    private val user = FirebaseAuth.getInstance().currentUser
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private val CHANNELID = "1"
 

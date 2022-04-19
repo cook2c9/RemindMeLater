@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -78,10 +79,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     color = MaterialTheme.colors.background
                 ) {
                     MainScreen()
-                    isLocationPermissionGranted()
                     Map()
                     createNotificationChannel()
-                    lifecycleScope.launch { addSavedRemindersGeofences() }
+                    requestLocationPermission()
                 }
             }
         }
@@ -184,7 +184,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 Button(
                     onClick = {
                         Log.d("MESSAGE: ", "Reminder List Button Clicked")
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         hideMap()
                         isVisible = true
                     },
@@ -203,11 +202,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
                 Button(
                     onClick = {
-                        Toast.makeText(context, "You clicked the button", Toast.LENGTH_LONG).show()
                         Log.d("MESSAGE: ", "Map View Button Clicked")
-//                        Toast.makeText(context,, Toast.LENGTH_LONG).show()
                         isVisible = false
                         showMap()
+                        enableUserLocation(mMap)
                         lifecycleScope.launch { moveMapToUser() }
                     },
                     modifier = Modifier
@@ -309,7 +307,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         UpdateReminderDialog(openDialog)
                         Button(
                             onClick = {
-                                viewModel.deleteReminder(reminder.geoID.toString())
+                                viewModel.deleteReminder(reminder.geoID)
                             },
                             modifier = Modifier
                                 .padding(2.dp),
@@ -352,7 +350,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun showMap() {
         mapView = findViewById(R.id.map_layout)
-        enableUserLocation(mMap)
         mapView.visibility = View.VISIBLE
     }
 
@@ -395,31 +392,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    //     Checks whether all location permissions are granted and returns true or false
-//    private fun isLocationPermissionGranted(): Boolean {
-//        if (ActivityCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_COARSE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            return false
-//        }
-//        return true
-//    }
-
     // Sends a permission request to the user for the needed location permissions
     private fun requestLocationPermission() {
-        ActivityCompat.requestPermissions(
-            this,
+        requestPermissionLauncher.launch(
             arrayOf(
-                android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
-            ),
-            1
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION
+            )
         )
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        isGranted ->
+        if(isGranted.all { it.value }) {
+            enableUserLocation(mMap)
+            lifecycleScope.launch { addSavedRemindersGeofences() }
+        } else {
+            Toast.makeText(this, "Location Permission Needed", Toast.LENGTH_LONG).show()
+        }
     }
 
     //Gets users current location if available
@@ -434,7 +424,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             def.await()
         } else {
-            requestLocationPermission()
             null
         }
     }
@@ -443,8 +432,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     fun enableUserLocation(map: GoogleMap) {
         if (isLocationPermissionGranted()) {
             map.isMyLocationEnabled = true
-        } else {
-            requestLocationPermission()
         }
     }
 
@@ -541,18 +528,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        //     Checks whether all location permissions are granted and returns true or false
         fun isLocationPermissionGranted(): Boolean {
             if (ActivityCompat.checkSelfPermission(
                     staticContext,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                     staticContext,
                     android.Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
+                ) == PackageManager.PERMISSION_GRANTED
             ) {
-                return false
+                return true
             }
-            return true
+            return false
         }
     }
 }

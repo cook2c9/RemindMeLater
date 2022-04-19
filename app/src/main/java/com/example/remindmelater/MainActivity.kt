@@ -47,6 +47,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -148,7 +149,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     },
                     modifier = Modifier
                         .padding(4.dp)
-                        .width(400.dp)
+                        .width(340.dp)
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
                 ) {
@@ -495,5 +496,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 notify(1, builder.build())
             }
         }
+    }
+    fun signOut()
+    {
+        FirebaseAuth.getInstance().signOut()
+        val loginScreen = Intent(this@MainActivity, LoginActivity::class.java)
+        startActivity(loginScreen)
     }
 }

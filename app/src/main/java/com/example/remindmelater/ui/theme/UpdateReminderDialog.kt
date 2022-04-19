@@ -233,16 +233,4 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
     }
 }
 
-fun saveNewReminder(reminder: String, location : String, newTitle: String, email: String) {
-    val viewModel = MainViewModel()
-    val newReminder = Reminder()
-    newReminder.geoID = "sfdesfdedfa"
-    newReminder.longitude = location.toDouble()
-    newReminder.latitude = location.toDouble()
-    newReminder.body = reminder
-    newReminder.title = newTitle
-    newReminder.userEmail = email
-    newReminder.radius = 0
-    viewModel.saveReminders(newReminder)
-}
 

@@ -32,6 +32,7 @@ import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
 import com.google.firebase.auth.FirebaseAuth
 
+
 @Composable
 fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) {
 
@@ -204,6 +205,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                     Row(
                         horizontalArrangement = Arrangement.End
                     ) {
+
                         IconButton(onClick = {
                             var reminder = Reminder().apply {
                                 body = reminderBody.value
@@ -214,6 +216,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                             }
                             MainViewModel().checkIfReminderExists(documentID, reminder)
                         }
+
                         ) {
                             //Save Reminder Button
                             Icon(Icons.Filled.Check, null, tint = Color(5, 115, 34))
@@ -229,4 +232,5 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
         }
     }
 }
+
 

@@ -1,6 +1,6 @@
 package com.example.remindmelater.ui.theme
 
-import android.content.Context
+import android.location.Address
 import android.location.Geocoder
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -26,24 +26,23 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.ViewModel
-import com.example.remindmelater.MainViewModel
 import androidx.compose.ui.window.PopupProperties
+import com.example.remindmelater.MainViewModel
 import com.example.remindmelater.R
 import com.example.remindmelater.dto.Reminder
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @Composable
-fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
+fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
 
     val context = LocalContext.current
     val geocoder = Geocoder(context)
     var strSelectedData = ""
-    var reminderValue = remember { mutableStateOf("") }
+    var reminderBody = remember { mutableStateOf("") }
     val location = remember { mutableStateOf("") }
-    var titleValue = remember { mutableStateOf("") }
-    var userEmailValue = remember { mutableStateOf("") }
+    var reminderTitle = remember { mutableStateOf("") }
+    var reminderUser = remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester }
     //val viewModel: MainViewModel by viewModel<MainViewModel>()
     var auth = FirebaseAuth.getInstance()
@@ -54,6 +53,10 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    fun addressLookup(input: String): Address {
+        return geocoder.getFromLocationName(input, 1).first()
     }
 
     @Composable
@@ -165,8 +168,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     OutlinedTextField(
-                        value = reminderValue.value,
-                        onValueChange = { reminderValue.value = it },
+                        value = reminderBody.value,
+                        onValueChange = { reminderBody.value = it },
                         label = { Text(text = "Reminder") },
                         placeholder = { Text(text = "Reminder...") },
                         singleLine = true,
@@ -180,8 +183,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     OutlinedTextField(
-                        value = titleValue.value,
-                        onValueChange = { titleValue.value = it },
+                        value = reminderTitle.value,
+                        onValueChange = { reminderTitle.value = it },
                         label = { Text(text = "Title") },
                         placeholder = { Text(text = "Title") },
                         singleLine = true,
@@ -191,8 +194,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                     Spacer(modifier = Modifier.padding(10.dp))
 
                     OutlinedTextField(
-                        value = userEmailValue.value,
-                        onValueChange = { userEmailValue.value = it },
+                        value = reminderUser.value,
+                        onValueChange = { reminderUser.value = it },
                         label = { Text(text = "Email Address") },
                         placeholder = { Text(text = "Email Address") },
                         singleLine = true,
@@ -203,9 +206,11 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                         horizontalArrangement = Arrangement.End
                     ) {
                         IconButton(onClick = {
-                            var reminder = Reminder().apply{
-                                body = reminderValue.value
-                                title = titleValue.value
+                            var reminder = Reminder().apply {
+                                body = reminderBody.value
+                                title = reminderTitle.value
+                                latitude = addressLookup(strSelectedData).latitude
+                                longitude = addressLookup(strSelectedData).longitude
                                 userID = auth.currentUser?.uid
                             }
                             MainViewModel().saveReminders(reminder)
@@ -216,6 +221,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, context: Context) {
                         }
                         //Close Window/Cancel
                         IconButton(onClick = {openDialog.value = false}) {
+
                             Icon(Icons.Filled.Close, null, tint = Color.Red)
                         }
                     }

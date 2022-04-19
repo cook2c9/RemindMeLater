@@ -95,11 +95,11 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
     }
 
     fun saveReminders(reminder: Reminder){
-        val document =  if (reminder.geoID.isEmpty()) {
+        val document =  if (reminder.geoID == null || reminder.geoID.isEmpty()) {
             firestore.collection("reminders").document()
         }
         else {
-            firestore.collection("reminders").document(reminder.geoID)
+            firestore.collection("reminders").document(reminder.geoID!!)
         }
         reminder.geoID = document.id
         MainActivity().addMapMarker(reminder.geoID, reminder.title, reminder.latitude, reminder.longitude)
@@ -113,5 +113,32 @@ class MainViewModel(var reminderService : IReminderService = ReminderService()) 
     fun deleteReminder(documentID: String) {
         firestore.collection("reminders").document(documentID).delete()
         MainActivity().removeMapMarker(documentID)
+    }
+
+    fun updateReminder(documentID: String, reminder: Reminder){
+        reminder.geoID = documentID
+        firestore.collection("reminders").document(documentID)
+            .set(reminder)
+    }
+
+    fun checkIfReminderExists(documentID: String, reminder: Reminder){
+        Log.d("Document", "Is not null ${documentID}")
+        if(!documentID.equals(""))
+            firestore.collection("reminders").document(documentID)
+                .get().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val document = task.result
+                        if (document.exists()) {
+                            updateReminder(documentID, reminder)
+                            Log.d("TAG", "Document already exists. $documentID")
+                        }
+                    } else {
+                        Log.d("An Error Occurred", "Try again")
+                    }
+                }
+        else {
+            saveReminders(reminder)
+            Log.d("TAG", "Document does NOT exist. $documentID")
+        }
     }
 }

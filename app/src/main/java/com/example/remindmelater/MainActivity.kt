@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 text = "Hello, Set a Reminder for...",
                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
             )
-            UpdateReminderDialog(openDialog)
+            UpdateReminderDialog(openDialog, "")
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth()
@@ -305,10 +305,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                                     .background(color = Color(12, 121, 230))
                             )
                         }
-                        UpdateReminderDialog(openDialog)
+                        UpdateReminderDialog(openDialog, reminder.geoID)
                         Button(
                             onClick = {
-                                viewModel.deleteReminder(reminder.geoID.toString())
+                                viewModel.deleteReminder(reminder.geoID)
                             },
                             modifier = Modifier
                                 .padding(2.dp),

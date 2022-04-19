@@ -33,7 +33,7 @@ import com.example.remindmelater.dto.Reminder
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
+fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) {
 
     val context = LocalContext.current
     val geocoder = Geocoder(context)
@@ -212,7 +212,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>) {
                                 longitude = addressLookup(strSelectedData).longitude
                                 userID = auth.currentUser?.uid
                             }
-                            MainViewModel().saveReminders(reminder)
+                            MainViewModel().checkIfReminderExists(documentID, reminder)
                         }
                         ) {
                             //Save Reminder Button

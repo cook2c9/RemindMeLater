@@ -28,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,7 +63,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var markerList = HashMap<String, Marker>()
     private val viewModel: MainViewModel by viewModel<MainViewModel>()
     private val CHANNELID = "1"
-    private val user = FirebaseAuth.getInstance().currentUser
 
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
@@ -106,7 +106,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     fun DefaultPreview() {
         RemindMeLaterTheme {
             MainScreen()
-            ReminderRow()
         }
     }
 
@@ -123,17 +122,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 },
                 backgroundColor = Color(105, 208, 225),
                 navigationIcon = {
-                    IconButton(onClick = {/* Do Something*/ }) {
-                        Icon(Icons.Filled.Menu, null)
+                    IconButton(onClick = {signOut()}) {
+                        Icon(Icons.Default.Logout, null)
                     }
                 }, actions = {
-                    IconButton(onClick = { /*showDialog.value = true*/ }) {
+                    IconButton(onClick = {
+                        Log.d("Button", "Pushed")
+                    }) {
                         Icon(Icons.Filled.Settings, null)
                     }
                 })
 
             Text(
-                text = "Hello, " + (user?.email ?: "User") + ". Set a Reminder for...",
+                text = "Hello, Set a Reminder for...",
                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
             )
             UpdateReminderDialog(openDialog, "")
@@ -149,7 +150,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     },
                     modifier = Modifier
                         .padding(4.dp)
-                        .width(340.dp)
+                        .width(190.dp)
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
                 ) {
@@ -159,6 +160,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         modifier = Modifier.padding(end = 4.dp)
                     )
                     Text(text = "Myself")
+                }
+                Button(
+                    onClick = {
+
+                        openDialog.value = true
+
+                    },
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .width(190.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 4.dp)
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                    )
+                    Text(text = "Others")
                 }
             }
             Row(
@@ -247,7 +271,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if(isVisible) {
             Card(
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(horizontal = 4.dp, vertical = 4.dp)
+                    .fillMaxWidth(),
                 elevation = 8.dp,
                 backgroundColor = Color.LightGray,
                 shape = RoundedCornerShape(10.dp),
@@ -497,8 +523,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
-    fun signOut()
-    {
+    fun signOut() {
         FirebaseAuth.getInstance().signOut()
         val loginScreen = Intent(this@MainActivity, LoginActivity::class.java)
         startActivity(loginScreen)

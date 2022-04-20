@@ -52,6 +52,9 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.compose.material.Icon
+import androidx.compose.ui.res.stringResource
+import com.example.remindmelater.ui.theme.ButtonBlue
+import com.example.remindmelater.ui.theme.MainTeal
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -119,9 +122,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             TopAppBar(
                 elevation = 4.dp,
                 title = {
-                    Text("Remind Me Later")
+                    Text(stringResource(R.string.RemindMeLater))
                 },
-                backgroundColor = Color(105, 208, 225),
+                backgroundColor = MainTeal,
                 navigationIcon = {
                     IconButton(onClick = {signOut()}) {
                         Icon(Icons.Filled.Logout, null)
@@ -135,7 +138,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 })
 
             Text(
-                text = "Hello, " + (user?.email ?: "User"),
+                text = stringResource(R.string.Greeting) + (user?.email ?: stringResource(R.string.User)),
                 modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
             )
             UpdateReminderDialog(openDialog, "")
@@ -153,7 +156,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         .padding(4.dp)
                         .width(380.dp)
                         .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+                    colors = ButtonDefaults.buttonColors(backgroundColor = ButtonBlue)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Person,
@@ -177,14 +180,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         .padding(4.dp)
                         .height(35.dp)
                         .width(190.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+                    colors = ButtonDefaults.buttonColors(backgroundColor = ButtonBlue)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
                         modifier = Modifier.padding(end = 4.dp)
                     )
-                    Text(text = "Reminder List")
+                    Text(text = stringResource(R.string.ReminderList))
                 }
                 Button(
                     onClick = {
@@ -198,14 +201,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         .padding(4.dp)
                         .height(35.dp)
                         .width(190.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(12, 121, 230))
+                    colors = ButtonDefaults.buttonColors(backgroundColor = ButtonBlue)
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = null,
                         modifier = Modifier.padding(end = 4.dp)
                     )
-                    Text(text = "Map View")
+                    Text(text = stringResource(R.string.MapView))
                 }
             }
             if (isVisible) {
@@ -278,18 +281,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             modifier = Modifier
                                 .padding(2.dp),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color(
-                                    12,
-                                    121,
-                                    230
-                                )
+                                backgroundColor = ButtonBlue
                             )
                         ) {
                             Icon(
                                 Icons.Filled.Edit,
                                 contentDescription = "Edit",
                                 modifier = Modifier
-                                    .background(color = Color(12, 121, 230))
+                                    .background(color = ButtonBlue)
                             )
                         }
                         UpdateReminderDialog(openDialog, reminder.geoID)
@@ -300,18 +299,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                             modifier = Modifier
                                 .padding(2.dp),
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color(
-                                    12,
-                                    121,
-                                    230
-                                )
+                                backgroundColor = ButtonBlue
                             )
                         ) {
                             Icon(
                                 Icons.Filled.Delete,
                                 contentDescription = "Delete",
                                 modifier = Modifier
-                                    .background(color = Color(12, 121, 230))
+                                    .background(color = ButtonBlue)
                             )
                         }
                     }

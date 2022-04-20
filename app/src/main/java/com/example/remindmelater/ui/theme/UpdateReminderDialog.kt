@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -143,7 +144,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
             onDismissRequest = ::onDropdownDismissRequest,
             dropDownExpanded = dropDownExpanded.value,
             list = dropDownOptions.value,
-            label = "Location"
+            label = stringResource(R.string.Location)
         )
     }
 
@@ -163,7 +164,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Add/Update Reminder",
+                        text = stringResource(R.string.AddUpdateReminder),
                         color = Color.Black,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
@@ -180,8 +181,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                     OutlinedTextField(
                         value = reminderBody.value,
                         onValueChange = { reminderBody.value = it },
-                        label = { Text(text = "Reminder") },
-                        placeholder = { Text(text = "Reminder...") },
+                        label = { Text(text = stringResource(R.string.Reminder)) },
+                        placeholder = { Text(text = stringResource(R.string.ReminderDots)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(0.8f)
                     )
@@ -195,8 +196,8 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                     OutlinedTextField(
                         value = reminderTitle.value,
                         onValueChange = { reminderTitle.value = it },
-                        label = { Text(text = "Title") },
-                        placeholder = { Text(text = "Title") },
+                        label = { Text(text = stringResource(R.string.Title)) },
+                        placeholder = { Text(text = stringResource(R.string.Title)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(0.8f)
                     )
@@ -229,7 +230,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
 
                         ) {
                             //Save Reminder Button
-                            Icon(Icons.Filled.Check, null, tint = Color(5, 115, 34))
+                            Icon(Icons.Filled.Check, null, tint = Green)
                         }
                         //Close Window/Cancel
                         IconButton(onClick = {openDialog.value = false}) {

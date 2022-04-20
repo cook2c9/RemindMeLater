@@ -11,8 +11,10 @@ import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
 import kotlinx.coroutines.*
 
+//Watches for any geofences being tripped
 class GeofenceBroadcastReceiver(): BroadcastReceiver() {
 
+    //When the receiver sees a geofence has been tripped it will get the geofences and use it to create a notification
     override fun onReceive(context: Context?, intent: Intent?) {
         val geofencingEvent = intent?.let { GeofencingEvent.fromIntent(it) }
         var reminder: Reminder?

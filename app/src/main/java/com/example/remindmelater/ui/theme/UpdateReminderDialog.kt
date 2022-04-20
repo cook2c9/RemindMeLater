@@ -47,6 +47,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
     //val viewModel: MainViewModel by viewModel<MainViewModel>()
     val auth = FirebaseAuth.getInstance()
 
+    // Returns the address line of the top 5 geocoder results from a String
     fun addressAutoComplete(userInput: String): List<String> {
         return try {
             geocoder.getFromLocationName(userInput, 5).map { it.getAddressLine(0) }
@@ -55,6 +56,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
         }
     }
 
+    // Returns the first Address from the geocoder using a string input
     fun addressLookup(input: String): Address? {
         return try {
             geocoder.getFromLocationName(input, 1).first()
@@ -64,6 +66,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
 
     }
 
+    //Creates a textfield that can create a dropdown when provided a list of strings
     @Composable
     fun TextFieldWithDropdown(
         modifier: Modifier = Modifier,
@@ -119,10 +122,12 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
         val textFieldValue = remember { mutableStateOf(TextFieldValue()) }
         val dropDownExpanded = remember { mutableStateOf(false) }
 
+        //When the focus is off the dropdown hide it
         fun onDropdownDismissRequest() {
             dropDownExpanded.value = false
         }
 
+        //When the value changes in the Textfield
         fun onValueChanged(value: TextFieldValue) {
             strSelectedData = value.text
             dropDownExpanded.value = true
@@ -130,7 +135,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
             dropDownOptions.value = addressAutoComplete(strSelectedData)
         }
 
-
+        //Creates the actuall textfield
         TextFieldWithDropdown(
             modifier = Modifier.fillMaxWidth(0.8f),
             value = textFieldValue.value,
@@ -204,7 +209,9 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                     ) {
 
                         IconButton(onClick = {
+                            //When the reminder is saved the string in the location will be used to get the address.
                           val selectedAddress = addressLookup(strSelectedData)
+                            // Using the address if it isn't null all the values will be used to create a reminder
                           selectedAddress?.let {
                             val reminder = Reminder().apply {
                                 body = reminderBody.value
@@ -215,6 +222,7 @@ fun UpdateReminderDialog(openDialog: MutableState<Boolean>, documentID: String) 
                             }
                               MainViewModel().checkIfReminderExists(documentID, reminder)
                               openDialog.value = false
+                              //If a location is not found from the user input it will not save and notify the user a location is needed.
                           } ?: Toast.makeText(context,"A location needs to be selected", Toast.LENGTH_SHORT).show()
 
                         }

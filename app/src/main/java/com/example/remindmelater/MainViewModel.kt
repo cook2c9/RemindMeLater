@@ -41,6 +41,7 @@ class MainViewModel() : ViewModel() {
         addAll(reminderList)
     }
 
+    // Gets the signed in users reminders from firebase
     suspend fun getUserReminders() : List<Reminder>? {
         val def = CompletableDeferred<List<Reminder>?>()
         val user = auth.currentUser
@@ -51,6 +52,7 @@ class MainViewModel() : ViewModel() {
         return def.await()
     }
 
+    // Gets a single reminder from Firebase using the documentID
     suspend fun getDocument(documentID: String) : Reminder? {
         val def = CompletableDeferred<Reminder?>()
         firestore.collection("reminders")
@@ -62,6 +64,7 @@ class MainViewModel() : ViewModel() {
         return def.await()
     }
 
+    //Saves a reminder to firebase, also creates a map marker and geofence for the reminder.
     fun saveReminders(reminder: Reminder){
         val document =  if (reminder.geoID == null || reminder.geoID.isEmpty()) {
             firestore.collection("reminders").document()
@@ -78,6 +81,7 @@ class MainViewModel() : ViewModel() {
         handle.addOnFailureListener { Log.e("Firebase", "Save Failed")}
     }
 
+    //Deletes a reminder from firebase, removes the map marker, and removes the geofence use the documentID
     fun deleteReminder(documentID: String) {
         firestore.collection("reminders").document(documentID).delete()
         MainActivity().removeMapMarker(documentID)

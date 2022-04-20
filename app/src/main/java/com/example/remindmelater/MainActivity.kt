@@ -61,6 +61,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private val user = FirebaseAuth.getInstance().currentUser
     private val viewModel: MainViewModel by viewModel()
 
+    //Checks if the location permissions are granted and if they are enables the user location on the map and adds the saved reminders as geofences
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            isGranted ->
+        if(isGranted.all { it.value }) {
+            enableUserLocation(mMap)
+            lifecycleScope.launch { addSavedRemindersGeofences() }
+        } else {
+            Toast.makeText(this, "Location Permission Needed", Toast.LENGTH_LONG).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -84,6 +95,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // When the map is ready enables user location marker and adds the saved reminders as markers.
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
@@ -308,6 +320,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // Creates the map in the app
     @Composable
     fun Map() {
         val binding = ActivityMapsBinding.inflate(layoutInflater)
@@ -319,11 +332,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
+    // Hides the map in the app.
     private fun hideMap() {
         mapView = findViewById(R.id.map_layout)
         mapView.visibility = View.INVISIBLE
     }
 
+    // Sets the map to be visible in the app
     private fun showMap() {
         mapView = findViewById(R.id.map_layout)
         mapView.visibility = View.VISIBLE
@@ -336,6 +351,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         tempMarker?.let { markerList.put(id, it) }
     }
 
+    //Removes a map marker using the reminder's documentID from Firebase
     fun removeMapMarker(id: String) {
         val marker = markerList[id]
         marker?.remove()
@@ -348,6 +364,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.animateCamera(CameraUpdateFactory.zoomTo(5f))
     }
 
+    // Adds all the signed in user's reminders from Firebase to map markers
     private suspend fun addSavedRemindersMarkers() {
         val savedReminders: List<Reminder>? = MainViewModel().getUserReminders()
         savedReminders?.let { reminder ->
@@ -355,6 +372,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // Adds all the signed in user's reminders from Firebase to geofences
     private suspend fun addSavedRemindersGeofences() {
         val savedReminders = MainViewModel().getUserReminders()
         savedReminders?.let { reminder ->
@@ -378,17 +396,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        isGranted ->
-        if(isGranted.all { it.value }) {
-            enableUserLocation(mMap)
-            lifecycleScope.launch { addSavedRemindersGeofences() }
-        } else {
-            Toast.makeText(this, "Location Permission Needed", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    //Gets users current location if available
+    //Gets users last known location and returns when it has been successful
     @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
     internal suspend fun getLastLocation(): Location? {
         val def = CompletableDeferred<Location>()
@@ -404,18 +412,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    @SuppressLint("MissingPermission")
+    // Enables a marker on the map that shows the user's location
+    @SuppressLint("MissingPermission") // Permission checked with isLocationPermissionGranted
     fun enableUserLocation(map: GoogleMap) {
         if (isLocationPermissionGranted()) {
             map.isMyLocationEnabled = true
         }
     }
 
+    // Uses the users gps location and moves the map's camera to that spot on the map
     private suspend fun moveMapToUser() {
         val loc = getLastLocation()
         loc?.let { moveMapCamera(loc.latitude, loc.longitude) }
     }
 
+    //Creates a request that indicates when the geofences should trigger and adds them to the request
     private fun getGeofencingRequest(): GeofencingRequest {
         return GeofencingRequest.Builder().apply {
             setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
@@ -423,6 +434,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }.build()
     }
 
+    //Creates a new Geofence using the builder and adds it to the geofenceList
     internal fun createGeofence(id: String, lat: Double, long: Double, radius: Float = 300f) {
         geofenceList.add(
             Geofence.Builder()
@@ -450,6 +462,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         )
     }
 
+    //Adds all the Geofences in the geofence list
     @SuppressLint("MissingPermission") //Permission is checked with isLocationPermissionGranted()
     internal fun addGeofences() {
         if (isLocationPermissionGranted()) {
@@ -458,6 +471,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    //Creates a channel for the notifications to be sent through
     private fun createNotificationChannel() {
         val name = "Notification"
         val descriptionText = "Description"
@@ -470,6 +484,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         notificationManager.createNotificationChannel(channel)
     }
 
+    //Removes a geofence from the list using the Firebase documentID of the reminder
     fun removeGeofence(documentID: String) {
         geofenceList.removeIf { it.requestId == documentID }
     }
@@ -497,6 +512,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             PendingIntent.getBroadcast(staticContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
+        // Creates a notification using the builder and shows the notification
         fun showNotification(con: Context, title: String, content: String) {
 
             val builder = NotificationCompat.Builder(con, "1")
@@ -511,7 +527,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        //     Checks whether all location permissions are granted and returns true or false
+        // Checks whether all location permissions are granted and returns true or false
         fun isLocationPermissionGranted(): Boolean {
             if (ActivityCompat.checkSelfPermission(
                     staticContext,
@@ -525,7 +541,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             return false
         }
-
-
     }
 }
